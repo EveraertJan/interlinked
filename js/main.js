@@ -141,12 +141,25 @@
   // ── Mouse: main canvas ────────────────────────────────────────────────────
 
   canvas.addEventListener('mousedown',   onMouseDown);
-  canvas.addEventListener('dblclick',    onDblClick);
   canvas.addEventListener('contextmenu', onContextMenu);
   window.addEventListener('mousemove',   onMouseMove);
   window.addEventListener('mouseup',     onMouseUp);
 
+  function openPickerAtPoint(clientX, clientY) {
+    if (Picker.isOpen()) { Picker.close(); return; }
+    const world = Canvas.screenToWorld(clientX, clientY);
+    for (const n of State.getNodes()) {
+      if (Nodes.hitTestNode(n, world.x, world.y)) return; // long-pressed a node, not empty space
+    }
+    Picker.open(world.x, world.y, clientX, clientY, (itemId, colIndex, wx, wy) => {
+      const item = items[itemId];
+      if (!item) return;
+      State.addNode(Nodes.createNode(itemId, item, colIndex, wx, wy));
+    }, 3);
+  }
+
   function onMouseDown(e) {
+    cancelMouseLongPress();
     hideContextMenu();
 
     // Middle-click or Space+drag → pan
@@ -222,7 +235,7 @@
       }
     }
 
-    // ── Empty canvas → deselect + pan ──
+    // ── Empty canvas → deselect + pan (+ arm long-press for mouse) ──
     selectedNodeIds = new Set();
     selectedConnId  = null;
     const vp2 = State.getViewport();
@@ -230,10 +243,26 @@
     dragMode = 'pan';
     canvas.style.cursor = 'grabbing';
     Canvas.startDragLoop();
+
+    if (!e._fromTouch) {
+      mouseLongPressOrigin = { x: e.clientX, y: e.clientY };
+      mouseLongPressTimer  = setTimeout(() => {
+        mouseLongPressTimer = null;
+        panStart = null; dragMode = null;
+        Canvas.stopDragLoop();
+        canvas.style.cursor = spaceDown ? 'grab' : 'default';
+        openPickerAtPoint(mouseLongPressOrigin.x, mouseLongPressOrigin.y);
+      }, 500);
+    }
   }
 
   function onMouseMove(e) {
     if (dragMode === 'pan' && panStart) {
+      if (mouseLongPressOrigin) {
+        const dx = e.clientX - mouseLongPressOrigin.x;
+        const dy = e.clientY - mouseLongPressOrigin.y;
+        if (dx * dx + dy * dy > 100) cancelMouseLongPress();
+      }
       const vp = State.getViewport();
       State.setViewport({
         ...vp,
@@ -289,6 +318,7 @@
   }
 
   function onMouseUp(e) {
+    cancelMouseLongPress();
     if (dragMode === 'pan') {
       panStart = null;
       canvas.style.cursor = spaceDown ? 'grab' : 'default';
@@ -382,24 +412,6 @@
     }
 
     dragMode = null;
-  }
-
-  function onDblClick(e) {
-    if (e.target !== canvas) return;
-    const world = Canvas.screenToWorld(e.clientX, e.clientY);
-
-    // Don't open picker when double-clicking a node
-    for (const n of State.getNodes()) {
-      if (Nodes.hitTestNode(n, world.x, world.y)) return;
-    }
-
-    if (Picker.isOpen()) { Picker.close(); return; }
-
-    Picker.open(world.x, world.y, e.clientX, e.clientY, (itemId, colIndex, wx, wy) => {
-      const item = items[itemId];
-      if (!item) return;
-      State.addNode(Nodes.createNode(itemId, item, colIndex, wx, wy));
-    }, 3);
   }
 
   // ── Keyboard ──────────────────────────────────────────────────────────────
@@ -679,11 +691,19 @@
       clientX: touch.clientX, clientY: touch.clientY,
       button: 0, target: canvas,
       metaKey: false, ctrlKey: false, shiftKey: false,
+      _fromTouch: true,
       preventDefault() {},
     };
   }
 
-  let lastTap       = { time: 0, x: 0, y: 0 };
+  let mouseLongPressTimer  = null;
+  let mouseLongPressOrigin = null;
+
+  function cancelMouseLongPress() {
+    if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
+    mouseLongPressOrigin = null;
+  }
+
   let longPressTimer  = null;
   let longPressOrigin = null;  // { x, y } screen coords at touchstart
 
@@ -698,18 +718,17 @@
     const touch = e.touches[0];
     cancelLongPress();
 
-    // Detect whether the finger is on a node → arm long-press for context menu
     const world = Canvas.screenToWorld(touch.clientX, touch.clientY);
     let onNode = false;
     for (let i = State.getNodes().length - 1; i >= 0; i--) {
       if (Nodes.hitTestNode(State.getNodes()[i], world.x, world.y)) { onNode = true; break; }
     }
 
-    if (onNode) {
-      longPressOrigin = { x: touch.clientX, y: touch.clientY };
-      longPressTimer  = setTimeout(() => {
-        longPressTimer = null;
-        // Abort any node drag that started during the press
+    longPressOrigin = { x: touch.clientX, y: touch.clientY };
+    longPressTimer  = setTimeout(() => {
+      longPressTimer = null;
+      if (onNode) {
+        // Abort any node drag and show context menu
         if (dragMode === 'node' && nodeDragState) {
           nodeDragState.nodeIds.forEach(id => {
             const s = nodeDragState.starts.get(id);
@@ -720,10 +739,15 @@
           Canvas.stopDragLoop();
           Canvas.render();
         }
-        // Show context menu at press location
         onContextMenu({ preventDefault() {}, clientX: longPressOrigin.x, clientY: longPressOrigin.y });
-      }, 500);
-    }
+      } else {
+        // Abort pan and open picker
+        panStart = null; dragMode = null;
+        Canvas.stopDragLoop();
+        canvas.style.cursor = 'default';
+        openPickerAtPoint(longPressOrigin.x, longPressOrigin.y);
+      }
+    }, 500);
 
     onMouseDown(mkEvt(touch));
   }, { passive: false });
@@ -744,23 +768,7 @@
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
     cancelLongPress();
-    const touch = e.changedTouches[0];
-
-    // Double-tap → open picker (only if not mid-drag)
-    const now = Date.now();
-    const dx  = touch.clientX - lastTap.x;
-    const dy  = touch.clientY - lastTap.y;
-    if (now - lastTap.time < 300 && dx * dx + dy * dy < 900) {
-      lastTap = { time: 0, x: 0, y: 0 };
-      if (!nodeDragState?.moved) {
-        onMouseUp(mkEvt(touch));
-        onDblClick({ target: canvas, clientX: touch.clientX, clientY: touch.clientY });
-        return;
-      }
-    }
-    lastTap = { time: now, x: touch.clientX, y: touch.clientY };
-
-    onMouseUp(mkEvt(touch));
+    onMouseUp(mkEvt(e.changedTouches[0]));
   }, { passive: false });
 
   canvas.addEventListener('touchcancel', e => {
