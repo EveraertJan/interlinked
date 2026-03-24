@@ -179,15 +179,29 @@
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
 
-    // Single hit-test per node using zone (left 25% / middle 50% / right 25%)
-    let hitNode = null, hitZone = null;
-    for (let i = nodes.length - 1; i >= 0; i--) {
-      const zone = Nodes.getNodeZone(nodes[i], world.x, world.y);
-      if (zone) { hitNode = nodes[i]; hitZone = zone; break; }
+    // Hit detection: zones (touch) vs port circles (mouse)
+    let hitNode = null, hitSide = null;
+    if (e._fromTouch) {
+      // Touch: divide node into left-25% / middle-50% / right-25% zones
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const zone = Nodes.getNodeZone(nodes[i], world.x, world.y);
+        if (zone) { hitNode = nodes[i]; hitSide = zone; break; }
+      }
+    } else {
+      // Mouse: port circles first, then node body
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const side = Nodes.hitTestPort(nodes[i], world.x, world.y);
+        if (side) { hitNode = nodes[i]; hitSide = side; break; }
+      }
+      if (!hitNode) {
+        for (let i = nodes.length - 1; i >= 0; i--) {
+          if (Nodes.hitTestNode(nodes[i], world.x, world.y)) { hitNode = nodes[i]; hitSide = 'body'; break; }
+        }
+      }
     }
 
-    // ── Left zone → backward connection drag ──
-    if (hitNode && hitZone === 'input') {
+    // ── Input side → backward connection drag ──
+    if (hitNode && hitSide === 'input') {
       e.preventDefault();
       const fromPort = Nodes.getPortPositions(hitNode).input;
       connDragState  = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'backward' };
@@ -198,8 +212,8 @@
       return;
     }
 
-    // ── Right zone → forward connection drag ──
-    if (hitNode && hitZone === 'output') {
+    // ── Output side → forward connection drag ──
+    if (hitNode && hitSide === 'output') {
       e.preventDefault();
       const fromPort  = Nodes.getPortPositions(hitNode).output;
       connDragState   = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'forward' };
@@ -210,7 +224,7 @@
       return;
     }
 
-    // ── Middle zone → select + start drag ──
+    // ── Node body → select + start drag ──
     if (hitNode) {
       e.preventDefault();
       if (!selectedNodeIds.has(hitNode.id)) {
@@ -310,22 +324,24 @@
       return;
     }
 
-    // Hover — zone-based cursor feedback
+    // Hover — port-dot hit for cursor feedback (mouse only; touch has no hover)
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
-    let foundZone = null, foundNode = null;
+    let found = null;
     for (let i = nodes.length - 1; i >= 0; i--) {
-      const zone = Nodes.getNodeZone(nodes[i], world.x, world.y);
-      if (zone) { foundZone = zone; foundNode = nodes[i]; break; }
+      const side = Nodes.hitTestPort(nodes[i], world.x, world.y);
+      if (side) { found = { nodeId: nodes[i].id, side }; break; }
+    }
+    if (!found) {
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        if (Nodes.hitTestNode(nodes[i], world.x, world.y)) { found = { nodeId: nodes[i].id, side: 'body' }; break; }
+      }
     }
     const prevPort = hoveredPort;
-    hoveredPort = (foundZone === 'input' || foundZone === 'output')
-      ? { nodeId: foundNode.id, side: foundZone }
-      : null;
-    const nextCursor = foundZone === 'input' || foundZone === 'output'
+    hoveredPort = (found?.side === 'input' || found?.side === 'output') ? found : null;
+    canvas.style.cursor = found?.side === 'input' || found?.side === 'output'
       ? 'crosshair'
-      : foundZone === 'body' ? 'grab' : (spaceDown ? 'grab' : 'default');
-    canvas.style.cursor = nextCursor;
+      : found?.side === 'body' ? 'grab' : (spaceDown ? 'grab' : 'default');
     if (JSON.stringify(hoveredPort) !== JSON.stringify(prevPort)) Canvas.render();
   }
 
