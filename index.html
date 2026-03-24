@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interaction Storyboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <canvas id="graph-canvas"></canvas>
+
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div class="toolbar-group">
+      <button class="tb-btn" id="btn-new" title="New board">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+          <line x1="6.5" y1="4" x2="6.5" y2="9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="4" y1="6.5" x2="9" y2="6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        New
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <div class="toolbar-group">
+      <button class="tb-btn" id="btn-load" title="Load board from JSON">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M2 9.5V11H11V9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M6.5 2V8.5M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Load
+      </button>
+      <button class="tb-btn" id="btn-save" title="Save board as JSON">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M2 3.5V11H11V3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M6.5 2V8.5M4 5l2.5-2.5L9 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Save
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <div class="toolbar-group">
+      <button class="tb-btn" id="btn-export-svg" title="Export as SVG">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M4 5h2M4 8h5M7 5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        SVG
+      </button>
+      <button class="tb-btn" id="btn-export-png" title="Export as PNG">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+          <circle cx="4.5" cy="4.5" r="1" fill="currentColor"/>
+          <path d="M1 9l3-3 2.5 2.5L9 6l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        PNG
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <div class="toolbar-group">
+      <button class="tb-btn" id="btn-layout" title="Auto-layout nodes">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="1" y="2" width="3" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/>
+          <rect x="5" y="4" width="3" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+          <rect x="9" y="1" width="3" height="11" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        Auto-layout
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <div class="toolbar-group">
+      <button class="tb-btn" id="btn-undo" title="Undo (⌘Z)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M2 5.5h5.5a3.5 3.5 0 110 7H4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 5.5L4.5 3M2 5.5L4.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Undo
+      </button>
+      <button class="tb-btn" id="btn-redo" title="Redo (⌘⇧Z)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M11 5.5H5.5a3.5 3.5 0 100 7H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11 5.5L8.5 3M11 5.5L8.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Redo
+      </button>
+    </div>
+
+    <div class="toolbar-spacer"></div>
+
+    <span id="last-saved"></span>
+  </div>
+
+  <!-- Picker Panel -->
+  <div id="picker-panel" hidden>
+    <div class="picker-tabs" id="picker-tabs"></div>
+    <div class="picker-search-wrap">
+      <input type="text" class="picker-search" id="picker-search" placeholder="Search nodes…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="picker-list" id="picker-list"></div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="context-menu" hidden>
+    <button class="ctx-item danger" id="ctx-delete">Delete node</button>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div id="confirm-dialog" hidden>
+    <div class="confirm-box">
+      <p id="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button class="tb-btn" id="confirm-cancel">Cancel</button>
+        <button class="tb-btn primary" id="confirm-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file input for load -->
+  <input type="file" id="file-input" accept=".json" style="display:none">
+
+  <!-- Scripts -->
+  <script src="js/state.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/nodes.js"></script>
+  <script src="js/connections.js"></script>
+  <script src="js/picker.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

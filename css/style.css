@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8f8f8;
+  font-family: 'Inter', sans-serif;
+}
+
+#graph-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  cursor: default;
+}
+
+/* ── Toolbar ── */
+#toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: #ffffff;
+  border-bottom: 1px solid #e4e4e0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  z-index: 100;
+  user-select: none;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: #e4e4e0;
+  margin: 0 6px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.tb-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #333;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.tb-btn:hover {
+  background: #f0efeb;
+  border-color: #ddd;
+}
+
+.tb-btn:active {
+  background: #e8e7e3;
+}
+
+.tb-btn.primary {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.tb-btn.primary:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.tb-btn svg {
+  flex-shrink: 0;
+}
+
+#last-saved {
+  font-size: 11px;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* ── Picker Panel ── */
+#picker-panel {
+  position: fixed;
+  width: 320px;
+  max-height: 480px;
+  background: #ffffff;
+  border: 1px solid #e4e4e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#picker-panel[hidden] {
+  display: none;
+}
+
+.picker-tabs {
+  display: flex;
+  border-bottom: 1px solid #e4e4e0;
+  padding: 0 8px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.picker-tabs::-webkit-scrollbar { display: none; }
+
+.picker-tab {
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #888;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.1s;
+  margin-bottom: -1px;
+}
+
+.picker-tab:hover { color: #333; }
+
+.picker-tab.active {
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+}
+
+.picker-search-wrap {
+  padding: 8px;
+  border-bottom: 1px solid #f0efeb;
+  flex-shrink: 0;
+}
+
+.picker-search {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e0;
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #333;
+  background: #fafaf8;
+  outline: none;
+  transition: border-color 0.1s;
+}
+
+.picker-search:focus {
+  border-color: #999;
+  background: #fff;
+}
+
+.picker-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0;
+}
+
+.picker-section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #aaa;
+  padding: 6px 12px 2px;
+}
+
+.picker-divider {
+  height: 1px;
+  background: #f0efeb;
+  margin: 4px 0;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #222;
+  transition: background 0.08s;
+}
+
+.picker-item:hover {
+  background: #f5f4f0;
+}
+
+.picker-item.active {
+  background: #eeedf0;
+}
+
+.picker-item-sense-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.picker-item-agency {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.picker-item-label {
+  flex: 1;
+}
+
+/* ── Context Menu ── */
+#context-menu {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid #e4e4e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 300;
+  padding: 4px 0;
+  min-width: 160px;
+}
+
+#context-menu[hidden] { display: none; }
+
+.ctx-item {
+  display: block;
+  width: 100%;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: #222;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.08s;
+}
+
+.ctx-item:hover { background: #f5f4f0; }
+.ctx-item.danger { color: #c0392b; }
+.ctx-item.danger:hover { background: #fdf0ee; }
+
+/* ── Delete Confirmation Dialog ── */
+#confirm-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+}
+
+#confirm-dialog[hidden] { display: none; }
+
+.confirm-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+
+.confirm-box p {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.confirm-actions .tb-btn {
+  height: 34px;
+}

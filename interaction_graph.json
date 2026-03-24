@@ -1,0 +1,1611 @@
+{
+  "columns": [
+    {
+      "id": "input_device",
+      "label": "Input Device",
+      "items": [
+        {
+          "id": "id_camera",
+          "name": "Camera",
+          "connects_to": [
+            "ie_hand_tracking",
+            "ie_face_recognition",
+            "ie_gesture",
+            "ie_pose",
+            "ie_gaze",
+            "ie_motion_detection",
+            "ie_expression"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_depth_camera",
+          "name": "Depth Camera",
+          "connects_to": [
+            "ie_hand_tracking",
+            "ie_gesture",
+            "ie_pose",
+            "ie_motion_detection",
+            "ie_proximity"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_microphone",
+          "name": "Microphone",
+          "connects_to": [
+            "ie_voice",
+            "ie_sound_trigger",
+            "ie_pitch",
+            "ie_breath"
+          ],
+          "audience": "both",
+          "agency": "both"
+        },
+        {
+          "id": "id_keyboard",
+          "name": "Keyboard",
+          "connects_to": [
+            "ie_keystroke",
+            "ie_typing_rhythm",
+            "ie_shortcut"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_mouse",
+          "name": "Mouse",
+          "connects_to": [
+            "ie_cursor",
+            "ie_scroll",
+            "ie_hover",
+            "ie_click"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_touch",
+          "name": "Touch Screen",
+          "connects_to": [
+            "ie_gesture",
+            "ie_pressure",
+            "ie_multi_touch",
+            "ie_cursor"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_stylus",
+          "name": "Stylus",
+          "connects_to": [
+            "ie_pressure",
+            "ie_cursor",
+            "ie_gesture"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_imu",
+          "name": "IMU",
+          "connects_to": [
+            "ie_tilt",
+            "ie_motion_detection",
+            "ie_shake",
+            "ie_orientation"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_eeg",
+          "name": "EEG",
+          "connects_to": [
+            "ie_brain_signal",
+            "ie_focus",
+            "ie_emotional_state"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_emg",
+          "name": "EMG",
+          "connects_to": [
+            "ie_muscle_signal",
+            "ie_gesture"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "id_gsr",
+          "name": "GSR Sensor",
+          "connects_to": [
+            "ie_emotional_state",
+            "ie_arousal"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_ppg",
+          "name": "PPG / Heart Sensor",
+          "connects_to": [
+            "ie_heartbeat",
+            "ie_emotional_state"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_eye_tracker",
+          "name": "Eye Tracker",
+          "connects_to": [
+            "ie_gaze",
+            "ie_blink",
+            "ie_dilation"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "id_gps",
+          "name": "GPS",
+          "connects_to": [
+            "ie_location",
+            "ie_movement_path"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_lidar",
+          "name": "LiDAR",
+          "connects_to": [
+            "ie_proximity",
+            "ie_motion_detection",
+            "ie_hand_tracking",
+            "ie_pose"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_gamepad",
+          "name": "Gamepad / Controller",
+          "connects_to": [
+            "ie_click",
+            "ie_tilt",
+            "ie_shortcut",
+            "ie_pressure"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_breath_sensor",
+          "name": "Breath Sensor",
+          "connects_to": [
+            "ie_breath",
+            "ie_arousal"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "id_fingerprint",
+          "name": "Fingerprint / Iris Scanner",
+          "connects_to": [
+            "ie_identity",
+            "ie_presence"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "id_light_sensor",
+          "name": "Ambient Light Sensor",
+          "connects_to": [
+            "ie_proximity",
+            "ie_presence"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "id_pressure_sensor",
+          "name": "Pressure Sensor",
+          "connects_to": [
+            "ie_pressure",
+            "ie_weight"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "id_ext_env_sensor",
+          "name": "Environmental Sensor",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "communal",
+          "agency": "uncontrolled",
+          "connects_to": [
+            "ie_motion_detection",
+            "ie_proximity",
+            "ie_presence"
+          ]
+        },
+        {
+          "id": "id_ext_weather",
+          "name": "Weather / Climate API",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "communal",
+          "agency": "uncontrolled",
+          "connects_to": [
+            "ie_presence",
+            "ie_motion_detection"
+          ]
+        },
+        {
+          "id": "id_ext_api",
+          "name": "API Data Feed",
+          "source": "external",
+          "control": "wild",
+          "audience": "both",
+          "agency": "controlled",
+          "connects_to": [
+            "ie_presence",
+            "ie_identity",
+            "ie_emotional_state"
+          ]
+        },
+        {
+          "id": "id_ext_rss",
+          "name": "RSS / Web Stream",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "communal",
+          "agency": "uncontrolled",
+          "connects_to": [
+            "ie_sound_trigger",
+            "ie_presence"
+          ]
+        },
+        {
+          "id": "id_ext_clock",
+          "name": "Clock / Scheduled Event",
+          "source": "external",
+          "control": "controlled",
+          "audience": "both",
+          "agency": "controlled",
+          "connects_to": [
+            "ie_presence",
+            "ie_shortcut"
+          ]
+        },
+        {
+          "id": "id_ext_device_state",
+          "name": "Device State",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "individual",
+          "agency": "uncontrolled",
+          "connects_to": [
+            "ie_presence",
+            "ie_proximity"
+          ]
+        },
+        {
+          "id": "id_ext_remote_user",
+          "name": "Remote User Action",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "communal",
+          "agency": "uncontrolled",
+          "connects_to": [
+            "ie_gesture",
+            "ie_voice",
+            "ie_presence",
+            "ie_click"
+          ]
+        },
+        {
+          "id": "id_ext_nfc_rfid",
+          "name": "NFC / RFID / Barcode",
+          "source": "external",
+          "control": "wild",
+          "audience": "individual",
+          "agency": "controlled",
+          "connects_to": [
+            "ie_identity",
+            "ie_presence",
+            "ie_location"
+          ]
+        },
+        {
+          "id": "id_ext_file",
+          "name": "File / Media Input",
+          "source": "external",
+          "control": "controlled",
+          "audience": "individual",
+          "agency": "controlled",
+          "connects_to": [
+            "ie_identity",
+            "ie_presence"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "input_effect",
+      "label": "Input Effect",
+      "items": [
+        {
+          "id": "ie_hand_tracking",
+          "name": "Hand Tracking",
+          "connects_to": [
+            "ml_mapping",
+            "ml_gesture_classify",
+            "ml_threshold",
+            "ml_fusion",
+            "ml_sequence"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_gesture",
+          "name": "Gesture",
+          "connects_to": [
+            "ml_classification",
+            "ml_sequence",
+            "ml_threshold",
+            "ml_cached"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_face_recognition",
+          "name": "Face Recognition",
+          "connects_to": [
+            "ml_classification",
+            "ml_calibration",
+            "ml_state_machine"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_expression",
+          "name": "Facial Expression",
+          "connects_to": [
+            "ml_classification",
+            "ml_mapping",
+            "ml_fusion"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_gaze",
+          "name": "Gaze Direction",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_accumulation",
+            "ml_cached"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_blink",
+          "name": "Blink",
+          "connects_to": [
+            "ml_threshold",
+            "ml_sequence",
+            "ml_cached"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_dilation",
+          "name": "Pupil Dilation",
+          "connects_to": [
+            "ml_mapping",
+            "ml_fusion",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_pose",
+          "name": "Body Pose",
+          "connects_to": [
+            "ml_classification",
+            "ml_mapping",
+            "ml_sequence",
+            "ml_state_machine"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_motion_detection",
+          "name": "Motion Detection",
+          "connects_to": [
+            "ml_threshold",
+            "ml_filtering",
+            "ml_mapping",
+            "ml_accumulation"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_proximity",
+          "name": "Proximity",
+          "connects_to": [
+            "ml_threshold",
+            "ml_mapping",
+            "ml_inversion"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_voice",
+          "name": "Voice / Speech",
+          "connects_to": [
+            "ml_classification",
+            "ml_sequence",
+            "ml_cached",
+            "ml_mapping"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_pitch",
+          "name": "Pitch / Tone",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_filtering"
+          ],
+          "audience": "both",
+          "agency": "both"
+        },
+        {
+          "id": "ie_sound_trigger",
+          "name": "Sound Trigger",
+          "connects_to": [
+            "ml_threshold",
+            "ml_sequence",
+            "ml_cached"
+          ],
+          "audience": "communal",
+          "agency": "both"
+        },
+        {
+          "id": "ie_breath",
+          "name": "Breath",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_filtering",
+            "ml_accumulation"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_keystroke",
+          "name": "Keystroke",
+          "connects_to": [
+            "ml_threshold",
+            "ml_sequence",
+            "ml_state_machine",
+            "ml_cached"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_typing_rhythm",
+          "name": "Typing Rhythm",
+          "connects_to": [
+            "ml_classification",
+            "ml_calibration",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_shortcut",
+          "name": "Shortcut / Command",
+          "connects_to": [
+            "ml_state_machine",
+            "ml_sequence",
+            "ml_cached"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_cursor",
+          "name": "Cursor Position",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_filtering",
+            "ml_accumulation"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_scroll",
+          "name": "Scroll",
+          "connects_to": [
+            "ml_mapping",
+            "ml_accumulation",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_hover",
+          "name": "Hover / Dwell",
+          "connects_to": [
+            "ml_threshold",
+            "ml_accumulation",
+            "ml_cached"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_click",
+          "name": "Click / Tap",
+          "connects_to": [
+            "ml_threshold",
+            "ml_sequence",
+            "ml_state_machine"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_pressure",
+          "name": "Pressure",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_multi_touch",
+          "name": "Multi-touch",
+          "connects_to": [
+            "ml_fusion",
+            "ml_classification",
+            "ml_mapping"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_tilt",
+          "name": "Tilt / Orientation",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_shake",
+          "name": "Shake",
+          "connects_to": [
+            "ml_threshold",
+            "ml_sequence",
+            "ml_randomisation"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_orientation",
+          "name": "Orientation",
+          "connects_to": [
+            "ml_mapping",
+            "ml_filtering",
+            "ml_state_machine"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_brain_signal",
+          "name": "Brain Signal",
+          "connects_to": [
+            "ml_classification",
+            "ml_filtering",
+            "ml_mapping",
+            "ml_fusion"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_focus",
+          "name": "Focus / Attention",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_accumulation"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_muscle_signal",
+          "name": "Muscle Signal",
+          "connects_to": [
+            "ml_classification",
+            "ml_mapping",
+            "ml_threshold"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "ie_emotional_state",
+          "name": "Emotional State",
+          "connects_to": [
+            "ml_mapping",
+            "ml_fusion",
+            "ml_cached",
+            "ml_filtering"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_arousal",
+          "name": "Arousal Level",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_accumulation"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_heartbeat",
+          "name": "Heartbeat",
+          "connects_to": [
+            "ml_mapping",
+            "ml_filtering",
+            "ml_loop",
+            "ml_fusion"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_location",
+          "name": "Location",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_state_machine"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_movement_path",
+          "name": "Movement Path",
+          "connects_to": [
+            "ml_sequence",
+            "ml_classification",
+            "ml_mapping"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_identity",
+          "name": "Identity",
+          "connects_to": [
+            "ml_state_machine",
+            "ml_calibration"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ie_presence",
+          "name": "Presence / Absence",
+          "connects_to": [
+            "ml_inversion",
+            "ml_threshold",
+            "ml_state_machine"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "ie_weight",
+          "name": "Weight / Force",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_accumulation"
+          ],
+          "audience": "individual",
+          "agency": "both"
+        }
+      ]
+    },
+    {
+      "id": "manipulation",
+      "label": "Manipulation",
+      "items": [
+        {
+          "id": "ml_threshold",
+          "name": "Threshold",
+          "description": "Trigger when a value crosses a point",
+          "connects_to": [
+            "ml_state_machine",
+            "ml_cached",
+            "ml_sequence",
+            "ml_mapping"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_tone_melody",
+            "oe_vibration",
+            "oe_text_symbols",
+            "oe_motion_animation"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_mapping",
+          "name": "Mapping",
+          "description": "Translate one range to another",
+          "connects_to": [
+            "ml_filtering",
+            "ml_threshold",
+            "ml_loop"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_tone_melody",
+            "oe_space_depth",
+            "oe_motion_animation",
+            "oe_vibration",
+            "oe_temperature",
+            "oe_ambient_light"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_filtering",
+          "name": "Filtering",
+          "description": "Smooth, denoise, amplify",
+          "connects_to": [
+            "ml_mapping",
+            "ml_threshold",
+            "ml_classification"
+          ],
+          "output_connects_to": [
+            "oe_tone_melody",
+            "oe_light_colour",
+            "oe_motion_animation"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_classification",
+          "name": "Classification",
+          "description": "Recognise a gesture, word, face",
+          "connects_to": [
+            "ml_state_machine",
+            "ml_cached",
+            "ml_sequence"
+          ],
+          "output_connects_to": [
+            "oe_voice_language",
+            "oe_text_symbols",
+            "oe_light_colour",
+            "oe_motion_animation"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_gesture_classify",
+          "name": "Gesture Classification",
+          "description": "Identify specific hand or body gestures",
+          "connects_to": [
+            "ml_state_machine",
+            "ml_cached",
+            "ml_mapping"
+          ],
+          "output_connects_to": [
+            "oe_motion_animation",
+            "oe_space_depth",
+            "oe_light_colour"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_sequence",
+          "name": "Sequence Detection",
+          "description": "Recognise a pattern over time",
+          "connects_to": [
+            "ml_cached",
+            "ml_state_machine",
+            "ml_classification"
+          ],
+          "output_connects_to": [
+            "oe_tone_melody",
+            "oe_light_colour",
+            "oe_motion_animation",
+            "oe_voice_language"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_fusion",
+          "name": "Fusion",
+          "description": "Combine multiple inputs into one signal",
+          "connects_to": [
+            "ml_mapping",
+            "ml_classification",
+            "ml_filtering"
+          ],
+          "output_connects_to": [
+            "oe_presence",
+            "oe_space_depth",
+            "oe_light_colour",
+            "oe_full_body"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_state_machine",
+          "name": "State Machine",
+          "description": "Track modes and transitions",
+          "connects_to": [
+            "ml_cached",
+            "ml_mapping",
+            "ml_loop"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_motion_animation",
+            "oe_text_symbols",
+            "oe_voice_language",
+            "oe_ambient_light"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_prediction",
+          "name": "Prediction",
+          "description": "Anticipate the next action",
+          "connects_to": [
+            "ml_cached",
+            "ml_mapping",
+            "ml_state_machine"
+          ],
+          "output_connects_to": [
+            "oe_motion_animation",
+            "oe_text_symbols",
+            "oe_light_colour"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_calibration",
+          "name": "Calibration",
+          "description": "Personalise to a user over time",
+          "connects_to": [
+            "ml_mapping",
+            "ml_filtering",
+            "ml_classification"
+          ],
+          "output_connects_to": [
+            "oe_vibration",
+            "oe_light_colour",
+            "oe_tone_melody"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_cached",
+          "name": "Cached",
+          "description": "Store and delay, release at another moment",
+          "connects_to": [
+            "ml_mapping",
+            "ml_sequence",
+            "ml_decay",
+            "ml_loop"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_tone_melody",
+            "oe_vibration",
+            "oe_scent",
+            "oe_motion_animation"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_accumulation",
+          "name": "Accumulation",
+          "description": "Build up over time until released",
+          "connects_to": [
+            "ml_threshold",
+            "ml_cached",
+            "ml_decay"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_vibration",
+            "oe_tone_melody",
+            "oe_full_body"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_inversion",
+          "name": "Inversion",
+          "description": "Absence or stillness as the trigger",
+          "connects_to": [
+            "ml_threshold",
+            "ml_state_machine",
+            "ml_cached"
+          ],
+          "output_connects_to": [
+            "oe_silence",
+            "oe_light_colour",
+            "oe_ambient_light"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_decay",
+          "name": "Decay",
+          "description": "Signal fades gradually rather than stopping",
+          "connects_to": [
+            "ml_mapping",
+            "ml_loop",
+            "ml_filtering"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_tone_melody",
+            "oe_vibration",
+            "oe_ambient_light"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_loop",
+          "name": "Loop",
+          "description": "Repeat a signal or pattern cyclically",
+          "connects_to": [
+            "ml_decay",
+            "ml_mapping",
+            "ml_accumulation"
+          ],
+          "output_connects_to": [
+            "oe_tone_melody",
+            "oe_rhythm",
+            "oe_light_colour",
+            "oe_motion_animation"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "ml_randomisation",
+          "name": "Randomisation",
+          "description": "Introduce controlled unpredictability",
+          "connects_to": [
+            "ml_mapping",
+            "ml_loop",
+            "ml_cached"
+          ],
+          "output_connects_to": [
+            "oe_light_colour",
+            "oe_tone_melody",
+            "oe_motion_animation",
+            "oe_scent"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        }
+      ]
+    },
+    {
+      "id": "output_effect",
+      "label": "Output Effect",
+      "items": [
+        {
+          "id": "oe_light_colour",
+          "name": "Light & Colour",
+          "category": "What you see",
+          "connects_to": [
+            "od_screen",
+            "od_projector",
+            "od_hmd",
+            "od_ar",
+            "od_led",
+            "od_laser",
+            "od_ambient_light",
+            "od_ext_iot"
+          ],
+          "audience": "both",
+          "agency": "both"
+        },
+        {
+          "id": "oe_motion_animation",
+          "name": "Motion & Animation",
+          "category": "What you see",
+          "connects_to": [
+            "od_screen",
+            "od_hmd",
+            "od_projector",
+            "od_ar",
+            "od_ext_broadcast"
+          ],
+          "audience": "both",
+          "agency": "both"
+        },
+        {
+          "id": "oe_space_depth",
+          "name": "Space & Depth",
+          "category": "What you see",
+          "connects_to": [
+            "od_hmd",
+            "od_ar",
+            "od_laser",
+            "od_retinal"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_text_symbols",
+          "name": "Text & Symbols",
+          "category": "What you see",
+          "connects_to": [
+            "od_screen",
+            "od_eink",
+            "od_ar",
+            "od_projector",
+            "od_braille",
+            "od_ext_notification",
+            "od_ext_file_export",
+            "od_ext_database"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_presence",
+          "name": "Presence",
+          "category": "What you see",
+          "connects_to": [
+            "od_hmd",
+            "od_ar",
+            "od_spatial_audio",
+            "od_motion_platform",
+            "od_ext_api_call",
+            "od_ext_database"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_tone_melody",
+          "name": "Tone & Melody",
+          "category": "What you hear",
+          "connects_to": [
+            "od_speakers",
+            "od_headphones",
+            "od_bone_conduction",
+            "od_ext_broadcast"
+          ],
+          "audience": "both",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_rhythm",
+          "name": "Rhythm & Pulse",
+          "category": "What you hear",
+          "connects_to": [
+            "od_speakers",
+            "od_headphones",
+            "od_bone_conduction",
+            "od_ultrasonic_audio",
+            "od_ext_broadcast"
+          ],
+          "audience": "both",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_spatial_sound",
+          "name": "Space & Direction",
+          "category": "What you hear",
+          "connects_to": [
+            "od_spatial_audio",
+            "od_headphones",
+            "od_ultrasonic_audio"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_voice_language",
+          "name": "Voice & Language",
+          "category": "What you hear",
+          "connects_to": [
+            "od_speakers",
+            "od_headphones",
+            "od_bone_conduction",
+            "od_ext_notification",
+            "od_ext_broadcast"
+          ],
+          "audience": "both",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_silence",
+          "name": "Silence & Absence",
+          "category": "What you hear",
+          "connects_to": [
+            "od_headphones"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_vibration",
+          "name": "Vibration & Pulse",
+          "category": "What you feel",
+          "connects_to": [
+            "od_vibration_motor",
+            "od_force_feedback",
+            "od_electrotactile",
+            "od_motion_platform"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_resistance",
+          "name": "Resistance & Force",
+          "category": "What you feel",
+          "connects_to": [
+            "od_force_feedback",
+            "od_exoskeleton",
+            "od_robotic"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_texture",
+          "name": "Texture & Surface",
+          "category": "What you feel",
+          "connects_to": [
+            "od_tactile_array",
+            "od_ultrasonic_haptic",
+            "od_electrotactile"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_temperature",
+          "name": "Temperature",
+          "category": "What you feel",
+          "connects_to": [
+            "od_thermal",
+            "od_airflow"
+          ],
+          "audience": "both",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_weight_gravity",
+          "name": "Weight & Gravity",
+          "category": "What you feel",
+          "connects_to": [
+            "od_exoskeleton",
+            "od_motion_platform",
+            "od_force_feedback"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_scent",
+          "name": "Scent & Atmosphere",
+          "category": "What you smell & taste",
+          "connects_to": [
+            "od_olfactory"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_taste",
+          "name": "Taste & Sensation",
+          "category": "What you smell & taste",
+          "connects_to": [
+            "od_taste_sim"
+          ],
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "oe_guidance",
+          "name": "Guidance & Restraint",
+          "category": "How your body moves",
+          "connects_to": [
+            "od_exoskeleton",
+            "od_robotic",
+            "od_ems"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_balance",
+          "name": "Balance & Tilt",
+          "category": "How your body moves",
+          "connects_to": [
+            "od_motion_platform",
+            "od_exoskeleton"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_full_body",
+          "name": "Full Body Immersion",
+          "category": "How your body moves",
+          "connects_to": [
+            "od_exoskeleton",
+            "od_motion_platform",
+            "od_ems",
+            "od_neural"
+          ],
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_ambient_light",
+          "name": "Ambient Light & Mood",
+          "category": "The world around you",
+          "connects_to": [
+            "od_ambient_light",
+            "od_projector",
+            "od_laser",
+            "od_ext_iot"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_air_wind",
+          "name": "Air & Wind",
+          "category": "The world around you",
+          "connects_to": [
+            "od_airflow"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "oe_environment",
+          "name": "The Environment Responding",
+          "category": "The world around you",
+          "connects_to": [
+            "od_ambient_light",
+            "od_robotic",
+            "od_airflow",
+            "od_olfactory",
+            "od_ext_iot"
+          ],
+          "audience": "communal",
+          "agency": "accidental"
+        }
+      ]
+    },
+    {
+      "id": "output_device",
+      "label": "Output Device",
+      "items": [
+        {
+          "id": "od_screen",
+          "name": "Screen / Monitor",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_projector",
+          "name": "Projector",
+          "audience": "communal",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_hmd",
+          "name": "VR Headset",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_ar",
+          "name": "AR Overlay",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_led",
+          "name": "LED Array",
+          "audience": "communal",
+          "agency": "both"
+        },
+        {
+          "id": "od_laser",
+          "name": "Laser Projection",
+          "audience": "communal",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_retinal",
+          "name": "Retinal Projector",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_eink",
+          "name": "E-ink Display",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_speakers",
+          "name": "Speakers",
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_headphones",
+          "name": "Headphones",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_bone_conduction",
+          "name": "Bone Conduction",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_spatial_audio",
+          "name": "Spatial Audio System",
+          "audience": "communal",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_ultrasonic_audio",
+          "name": "Ultrasonic Audio",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_vibration_motor",
+          "name": "Vibration Motor",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_force_feedback",
+          "name": "Force Feedback Device",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_ultrasonic_haptic",
+          "name": "Mid-air Haptics",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_tactile_array",
+          "name": "Tactile Actuator Array",
+          "audience": "individual",
+          "agency": "both"
+        },
+        {
+          "id": "od_braille",
+          "name": "Braille Display",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_electrotactile",
+          "name": "Electrotactile Stimulator",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_thermal",
+          "name": "Thermal Device",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_airflow",
+          "name": "Airflow / Fan",
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_robotic",
+          "name": "Robotic Actuator",
+          "audience": "communal",
+          "agency": "both"
+        },
+        {
+          "id": "od_exoskeleton",
+          "name": "Exoskeleton / Suit",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_motion_platform",
+          "name": "Motion Platform",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_ems",
+          "name": "Electrical Muscle Stimulator",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_neural",
+          "name": "Neural Implant",
+          "audience": "individual",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_olfactory",
+          "name": "Olfactory Display",
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_taste_sim",
+          "name": "Taste Simulator",
+          "audience": "individual",
+          "agency": "intentional"
+        },
+        {
+          "id": "od_ambient_light",
+          "name": "Ambient Lighting",
+          "audience": "communal",
+          "agency": "accidental"
+        },
+        {
+          "id": "od_ext_api_call",
+          "name": "API Call / Webhook",
+          "source": "external",
+          "control": "wild",
+          "audience": "both",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_database",
+          "name": "Database Write",
+          "source": "external",
+          "control": "controlled",
+          "audience": "individual",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_notification",
+          "name": "Notification",
+          "source": "external",
+          "control": "controlled",
+          "audience": "individual",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_file_export",
+          "name": "File / Media Export",
+          "source": "external",
+          "control": "controlled",
+          "audience": "both",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_iot",
+          "name": "IoT / Device Control",
+          "source": "external",
+          "control": "controlled",
+          "audience": "communal",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_broadcast",
+          "name": "Broadcast / Stream",
+          "source": "external",
+          "control": "wild",
+          "audience": "communal",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_scheduled",
+          "name": "Scheduled Trigger",
+          "source": "external",
+          "control": "controlled",
+          "audience": "both",
+          "agency": "controlled"
+        },
+        {
+          "id": "od_ext_log",
+          "name": "Log / Analytics",
+          "source": "external",
+          "control": "uncontrolled",
+          "audience": "individual",
+          "agency": "uncontrolled"
+        }
+      ]
+    }
+  ]
+}

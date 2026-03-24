@@ -1,0 +1,181 @@
+// connections.js — bezier curve drawing, connection logic, highlight
+
+const Connections = (() => {
+  // Column adjacency: fromCol → array of valid toCols
+  const VALID_TARGETS = {
+    0: [1],
+    1: [2],
+    2: [2, 3],  // 2→2 is self-loop, 2→3 is forward
+    3: [4],
+    4: [],
+  };
+
+  function canConnect(fromNode, toNode) {
+    if (!fromNode || !toNode) return false;
+    if (fromNode.id === toNode.id) return false;
+    const validCols = VALID_TARGETS[fromNode.colIndex] || [];
+    return validCols.includes(toNode.colIndex);
+  }
+
+  function isLoop(fromNode, toNode) {
+    return fromNode.colIndex === 2 && toNode.colIndex === 2;
+  }
+
+  function getBezierPoints(fromPort, toPort, loop) {
+    const dx = Math.abs(toPort.x - fromPort.x);
+    const dy = toPort.y - fromPort.y;
+
+    if (loop) {
+      const loopH = 55 + Math.abs(dy) * 0.25;
+      return {
+        cp1: { x: fromPort.x + 40, y: fromPort.y - loopH },
+        cp2: { x: toPort.x - 40,   y: toPort.y - loopH },
+      };
+    }
+
+    return {
+      cp1: { x: fromPort.x + dx * 0.5, y: fromPort.y },
+      cp2: { x: toPort.x  - dx * 0.5, y: toPort.y  },
+    };
+  }
+
+  function drawConnection(ctx, fromPort, toPort, isSelected, loop) {
+    const { cp1, cp2 } = getBezierPoints(fromPort, toPort, loop);
+
+    ctx.save();
+    if (loop) {
+      ctx.setLineDash([5, 4]);
+    } else {
+      ctx.setLineDash([]);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(fromPort.x, fromPort.y);
+    ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, toPort.x, toPort.y);
+    ctx.strokeStyle = isSelected ? '#333333' : '#a0aab8';
+    ctx.lineWidth = isSelected ? 2 : 1;
+    ctx.globalAlpha = isSelected ? 1 : 0.3;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+
+    // Endpoint dots
+    const dotColor = isSelected ? '#333333' : '#a0aab8';
+    [fromPort, toPort].forEach(pt => {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = dotColor;
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  function drawLiveCurve(ctx, fromPort, cursorWorld) {
+    const dx = Math.abs(cursorWorld.x - fromPort.x);
+    const cp1 = { x: fromPort.x + dx * 0.5, y: fromPort.y };
+    const cp2 = { x: cursorWorld.x - dx * 0.5, y: cursorWorld.y };
+
+    ctx.save();
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(fromPort.x, fromPort.y);
+    ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cursorWorld.x, cursorWorld.y);
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.6;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // Sample bezier curve at parameter t ∈ [0,1]
+  function bezierPoint(p0, cp1, cp2, p1, t) {
+    const mt = 1 - t;
+    return {
+      x: mt*mt*mt*p0.x + 3*mt*mt*t*cp1.x + 3*mt*t*t*cp2.x + t*t*t*p1.x,
+      y: mt*mt*mt*p0.y + 3*mt*mt*t*cp1.y + 3*mt*t*t*cp2.y + t*t*t*p1.y,
+    };
+  }
+
+  function hitTestConnection(conn, nodes, wx, wy) {
+    const fromNode = nodes.find(n => n.id === conn.fromNodeId);
+    const toNode   = nodes.find(n => n.id === conn.toNodeId);
+    if (!fromNode || !toNode) return false;
+
+    const fromPort = Nodes.getPortPositions(fromNode).output;
+    const toPort   = Nodes.getPortPositions(toNode).input;
+    const loop = conn.isLoop;
+    const { cp1, cp2 } = getBezierPoints(fromPort, toPort, loop);
+
+    const SAMPLES = 24;
+    const THRESHOLD = 8;
+    for (let i = 0; i <= SAMPLES; i++) {
+      const t = i / SAMPLES;
+      const pt = bezierPoint(fromPort, cp1, cp2, toPort, t);
+      const dx = pt.x - wx;
+      const dy = pt.y - wy;
+      if (dx*dx + dy*dy <= THRESHOLD * THRESHOLD) return true;
+    }
+    return false;
+  }
+
+  function getHighlightMap(draggingFromNode, items) {
+    // Returns { nodeId: opacity } for all nodes while dragging a connection
+    const map = {};
+    const validCols = VALID_TARGETS[draggingFromNode.colIndex] || [];
+    const fromItem = items[draggingFromNode.itemId];
+
+    // Collect preferred target ids
+    const preferred = new Set();
+    if (fromItem) {
+      (fromItem.connects_to || []).forEach(id => preferred.add(id));
+      // For manipulation forward drag, also add output_connects_to
+      if (draggingFromNode.colIndex === 2) {
+        (fromItem.output_connects_to || []).forEach(id => preferred.add(id));
+      }
+    }
+
+    State.getNodes().forEach(node => {
+      if (node.id === draggingFromNode.id) {
+        map[node.id] = 1;
+        return;
+      }
+      if (validCols.includes(node.colIndex)) {
+        const targetItem = items[node.itemId];
+        const isPreferred = targetItem && preferred.has(targetItem.id);
+        map[node.id] = isPreferred ? 1.0 : 0.5;
+      } else {
+        map[node.id] = 0.2;
+      }
+    });
+
+    return map;
+  }
+
+  function drawAll(ctx, connections, nodes, selectedConnId) {
+    connections.forEach(conn => {
+      const fromNode = nodes.find(n => n.id === conn.fromNodeId);
+      const toNode   = nodes.find(n => n.id === conn.toNodeId);
+      if (!fromNode || !toNode) return;
+      const fromPort = Nodes.getPortPositions(fromNode).output;
+      const toPort   = Nodes.getPortPositions(toNode).input;
+      const isSelected = conn.id === selectedConnId;
+      drawConnection(ctx, fromPort, toPort, isSelected, conn.isLoop);
+    });
+  }
+
+  return {
+    canConnect,
+    isLoop,
+    drawConnection,
+    drawLiveCurve,
+    hitTestConnection,
+    getHighlightMap,
+    drawAll,
+    VALID_TARGETS,
+  };
+})();
+
+window.Connections = Connections;
