@@ -34,51 +34,26 @@ const Connections = (() => {
     const { cp1, cp2 } = getBezierPoints(fromPort, toPort, loop);
 
     ctx.save();
-    if (loop) {
-      ctx.setLineDash([5, 4]);
-    } else {
-      ctx.setLineDash([]);
-    }
-
-    const strokeColor = isSelected ? '#1a2a3a' : '#4a6a8a';
-    const strokeWidth = isSelected ? 3   : 2;
-    const strokeAlpha = isSelected ? 1   : 0.82;
-
-    // Glow pass (drawn before main stroke, behind it)
-    if (!isSelected) {
-      ctx.beginPath();
-      ctx.moveTo(fromPort.x, fromPort.y);
-      ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, toPort.x, toPort.y);
-      ctx.strokeStyle = '#7aadcc';
-      ctx.lineWidth   = strokeWidth + 4;
-      ctx.globalAlpha = 0.18;
-      ctx.shadowColor = '#7aadcc';
-      ctx.shadowBlur  = 6;
-      ctx.stroke();
-      ctx.shadowBlur  = 0;
-    }
+    ctx.setLineDash(loop ? [5, 4] : []);
+    ctx.globalAlpha = isSelected ? 1 : 0.4;
 
     ctx.beginPath();
     ctx.moveTo(fromPort.x, fromPort.y);
     ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, toPort.x, toPort.y);
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth   = strokeWidth;
-    ctx.globalAlpha = strokeAlpha;
+    ctx.strokeStyle = '#1A1A1A';
+    ctx.lineWidth   = isSelected ? 2 : 1;
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
 
-    // Endpoint dots
-    const dotColor = isSelected ? '#1a2a3a' : '#4a6a8a';
+    // Endpoint dots — match reference DOT_R style
     [fromPort, toPort].forEach(pt => {
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, isSelected ? 4 : 3.5, 0, Math.PI * 2);
-      ctx.fillStyle   = dotColor;
-      ctx.globalAlpha = strokeAlpha;
+      ctx.arc(pt.x, pt.y, isSelected ? 3 : 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#1A1A1A';
       ctx.fill();
-      ctx.globalAlpha = 1;
     });
 
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
 
@@ -92,9 +67,9 @@ const Connections = (() => {
     ctx.beginPath();
     ctx.moveTo(fromPort.x, fromPort.y);
     ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cursorWorld.x, cursorWorld.y);
-    ctx.strokeStyle = '#4a6a8a';
-    ctx.lineWidth   = 2;
-    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = '#1A1A1A';
+    ctx.lineWidth   = 1;
+    ctx.globalAlpha = 0.45;
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.globalAlpha = 1;

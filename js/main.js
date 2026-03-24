@@ -350,9 +350,11 @@
         Canvas.stopDragLoop();
         Canvas.render();
 
-        // Pre-select the next logical column tab (Input Device→Input Effect, etc.)
+        // Pre-select the next tab in the column sequence:
+        //   0 Input Device → 1 Input Effect → 2 Manipulation → 3 Output Effect → 4 Output Device
+        // Column 4 has no successor, so the picker stays on tab 4.
         const srcColIndex = State.getNodes().find(n => n.id === srcId)?.colIndex ?? 0;
-        const nextTab = srcColIndex < 4 ? srcColIndex + 1 : srcColIndex;
+        const nextTab     = Math.min(srcColIndex + 1, 4);
 
         Picker.open(dropWorld.x, dropWorld.y, screenPos.x, screenPos.y, (itemId, colIndex, wx, wy) => {
           const item = items[itemId];
