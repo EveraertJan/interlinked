@@ -159,7 +159,7 @@ const Picker = (() => {
       rowEl.appendChild(senseDot);
       rowEl.appendChild(agencyEl);
       rowEl.appendChild(labelEl);
-      rowEl.addEventListener('mousedown', e => { e.preventDefault(); placeItem(it); });
+      rowEl.addEventListener('click', () => placeItem(it));
       listEl.appendChild(rowEl);
     });
 
@@ -237,10 +237,13 @@ const Picker = (() => {
     }
   });
 
-  // Close on outside click
+  // Close on outside click / tap
   document.addEventListener('mousedown', e => {
     if (isOpen() && !panel.contains(e.target)) close();
   });
+  document.addEventListener('touchstart', e => {
+    if (isOpen() && !panel.contains(e.target)) close();
+  }, { passive: true });
 
   return { init, open, close, isOpen };
 })();

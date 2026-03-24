@@ -12,6 +12,8 @@ html, body {
   overflow: hidden;
   background: #f8f8f8;
   font-family: 'Inter', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #graph-canvas {
@@ -20,6 +22,8 @@ html, body {
   left: 0;
   display: block;
   cursor: default;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ── Toolbar ── */
@@ -72,6 +76,7 @@ html, body {
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.1s, border-color 0.1s;
+  touch-action: manipulation;
 }
 
 .tb-btn:hover {
@@ -147,6 +152,7 @@ html, body {
   font-family: 'Inter', sans-serif;
   transition: color 0.1s;
   margin-bottom: -1px;
+  touch-action: manipulation;
 }
 
 .picker-tab:hover { color: #333; }
@@ -211,6 +217,7 @@ html, body {
   font-size: 13px;
   color: #222;
   transition: background 0.08s;
+  touch-action: manipulation;
 }
 
 .picker-item:hover {

@@ -678,6 +678,64 @@
   document.getElementById('btn-export-svg').addEventListener('click', () => Export.exportSVG(items));
   document.getElementById('btn-export-png').addEventListener('click', () => Export.exportPNG(items));
 
+  // ── Touch support ─────────────────────────────────────────────────────────
+  // Converts a Touch into a synthetic mouse-event-like object so the existing
+  // mouse handlers can be reused without duplication.
+
+  function mkEvt(touch) {
+    return {
+      clientX:    touch.clientX,
+      clientY:    touch.clientY,
+      button:     0,
+      target:     canvas,
+      metaKey:    false,
+      ctrlKey:    false,
+      shiftKey:   false,
+      preventDefault() {},
+    };
+  }
+
+  // Double-tap state for picker
+  let lastTap = { time: 0, x: 0, y: 0 };
+
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (e.touches.length !== 1) return;   // ignore multi-touch
+    onMouseDown(mkEvt(e.touches[0]));
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length !== 1) return;
+    onMouseMove(mkEvt(e.touches[0]));
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+
+    // Double-tap detection → open picker
+    const now = Date.now();
+    const dx  = touch.clientX - lastTap.x;
+    const dy  = touch.clientY - lastTap.y;
+    if (now - lastTap.time < 300 && dx * dx + dy * dy < 900) {
+      lastTap = { time: 0, x: 0, y: 0 };
+      // Only fire if no drag happened (moved flag not set)
+      if (!nodeDragState?.moved && dragMode !== 'pan') {
+        onMouseUp(mkEvt(touch));
+        onDblClick({ target: canvas, clientX: touch.clientX, clientY: touch.clientY });
+        return;
+      }
+    }
+    lastTap = { time: now, x: touch.clientX, y: touch.clientY };
+
+    onMouseUp(mkEvt(touch));
+  }, { passive: false });
+
+  canvas.addEventListener('touchcancel', e => {
+    if (e.changedTouches[0]) onMouseUp(mkEvt(e.changedTouches[0]));
+  }, { passive: false });
+
   // ── Initial render ────────────────────────────────────────────────────────
 
   Canvas.render();
