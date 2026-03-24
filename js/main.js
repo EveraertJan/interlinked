@@ -752,7 +752,7 @@
     const dy  = touch.clientY - lastTap.y;
     if (now - lastTap.time < 300 && dx * dx + dy * dy < 900) {
       lastTap = { time: 0, x: 0, y: 0 };
-      if (!nodeDragState?.moved && dragMode !== 'pan') {
+      if (!nodeDragState?.moved) {
         onMouseUp(mkEvt(touch));
         onDblClick({ target: canvas, clientX: touch.clientX, clientY: touch.clientY });
         return;
