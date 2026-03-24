@@ -124,20 +124,6 @@
     Nodes.drawAll(ctx, State.getNodes(), items, [...selectedNodeIds], highlightMap, hoveredPort);
   });
 
-  // ── Last-saved label ──────────────────────────────────────────────────────
-
-  const lastSavedEl = document.getElementById('last-saved');
-
-  function updateLastSaved(date) {
-    if (!date) { lastSavedEl.textContent = ''; return; }
-    const h = String(date.getHours()).padStart(2, '0');
-    const m = String(date.getMinutes()).padStart(2, '0');
-    lastSavedEl.textContent = `Saved ${h}:${m}`;
-  }
-
-  State.on('saved', updateLastSaved);
-  if (didRestore) updateLastSaved(new Date());
-
   // ── Mouse: main canvas ────────────────────────────────────────────────────
 
   canvas.addEventListener('mousedown',   onMouseDown);

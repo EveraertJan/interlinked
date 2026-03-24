@@ -14,9 +14,8 @@ const Canvas = (() => {
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
-    const bottomBar = window.matchMedia('(orientation: portrait)').matches ? 52 : 0;
     const w = window.innerWidth;
-    const h = window.innerHeight - bottomBar;
+    const h = window.innerHeight - 52; // always leave room for bottom bar
     el.width  = w * dpr;
     el.height = h * dpr;
     el.style.width  = w + 'px';

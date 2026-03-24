@@ -103,11 +103,6 @@ html, body {
   flex-shrink: 0;
 }
 
-#last-saved {
-  font-size: 11px;
-  color: #999;
-  white-space: nowrap;
-}
 
 /* ── Picker Panel ── */
 #picker-panel {
@@ -325,35 +320,19 @@ html, body {
   height: 34px;
 }
 
-/* ── Bottom bar (Load / Save / SVG / PNG) ── */
-/* Landscape/desktop: flush with the toolbar top-right */
+/* ── Bottom bar (Load / Save / SVG / PNG) — always at bottom ── */
 #bottom-bar {
   position: fixed;
-  top: 0;
+  bottom: 0;
+  left: 0;
   right: 0;
-  height: 44px;
+  height: 52px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 12px;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  background: #ffffff;
+  border-top: 1px solid #e4e4e0;
   z-index: 100;
-}
-
-/* Portrait (mobile): full-width bar docked to bottom */
-@media (orientation: portrait) {
-  #toolbar-new-group,
-  #toolbar-new-sep { display: none; }
-
-  #bottom-bar {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 52px;
-    justify-content: center;
-    gap: 6px;
-    padding: 0 16px;
-    background: #ffffff;
-    border-top: 1px solid #e4e4e0;
-  }
 }
