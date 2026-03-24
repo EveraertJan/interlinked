@@ -15,6 +15,7 @@ const Picker = (() => {
   let placeWorld    = null;  // { x, y }
   let activeIndex   = -1;
   let filteredItems = [];    // flat ordered list of items currently visible
+  let suggestedIds  = null;  // Set of item IDs to highlight as suggested (wire-drop mode)
 
   // ── Public init ────────────────────────────────────────────────────────────
 
@@ -26,9 +27,10 @@ const Picker = (() => {
 
   // ── Open / Close ───────────────────────────────────────────────────────────
 
-  function open(worldX, worldY, screenX, screenY, placeCb, defaultTab) {
-    placeWorld = { x: worldX, y: worldY };
-    onPlace    = placeCb;
+  function open(worldX, worldY, screenX, screenY, placeCb, defaultTab, suggestedSet) {
+    placeWorld   = { x: worldX, y: worldY };
+    onPlace      = placeCb;
+    suggestedIds = suggestedSet instanceof Set ? suggestedSet : null;
 
     // Switch to requested tab before rendering
     if (defaultTab !== undefined && defaultTab >= 0 && defaultTab <= 4) {
@@ -60,6 +62,7 @@ const Picker = (() => {
     panel.setAttribute('hidden', '');
     searchEl.value = '';
     filteredItems  = [];
+    suggestedIds   = null;
   }
 
   function isOpen() {
@@ -109,6 +112,16 @@ const Picker = (() => {
     const rows = []; // { type: 'section'|'divider'|'item', item?, label? }
 
     if (!query) {
+      // Suggested section (wire-drop mode only)
+      if (suggestedIds && suggestedIds.size) {
+        const sugItems = colItems.filter(it => suggestedIds.has(it.id));
+        if (sugItems.length) {
+          rows.push({ type: 'section', label: 'Suggested' });
+          sugItems.forEach(it => rows.push({ type: 'item', item: it, suggested: true }));
+          rows.push({ type: 'divider' });
+        }
+      }
+
       const recentItems = recent
         .map(id => colItems.find(it => it.id === id))
         .filter(Boolean);
@@ -146,8 +159,10 @@ const Picker = (() => {
       const color   = window.Nodes ? Nodes.getSenseColor(sense) : '#b0b0b0';
       const agency  = normalizeAgency(it.agency);
 
+      const isSuggested = row.suggested || (suggestedIds && suggestedIds.has(it.id));
+
       const rowEl = document.createElement('div');
-      rowEl.className     = 'picker-item';
+      rowEl.className     = 'picker-item' + (isSuggested ? ' suggested' : '');
       rowEl.dataset.itemId = it.id;
 
       const senseDot = document.createElement('div');

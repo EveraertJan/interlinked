@@ -356,6 +356,12 @@
         const srcColIndex = State.getNodes().find(n => n.id === srcId)?.colIndex ?? 0;
         const nextTab     = Math.min(srcColIndex + 1, 4);
 
+        const srcItem    = items[State.getNodes().find(n => n.id === srcId)?.itemId];
+        const suggested  = new Set([
+          ...(srcItem?.connects_to        || []),
+          ...(srcItem?.output_connects_to || []),
+        ]);
+
         Picker.open(dropWorld.x, dropWorld.y, screenPos.x, screenPos.y, (itemId, colIndex, wx, wy) => {
           const item = items[itemId];
           if (!item) return;
@@ -370,7 +376,7 @@
               isLoop:     Connections.isLoop(srcNode, newNode),
             });
           }
-        }, nextTab);
+        }, nextTab, suggested);
       }
       return;
     }
@@ -393,7 +399,7 @@
       const item = items[itemId];
       if (!item) return;
       State.addNode(Nodes.createNode(itemId, item, colIndex, wx, wy));
-    });
+    }, 3);
   }
 
   // ── Keyboard ──────────────────────────────────────────────────────────────
