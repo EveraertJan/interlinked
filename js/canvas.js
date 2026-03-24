@@ -14,10 +14,13 @@ const Canvas = (() => {
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
-    el.width = window.innerWidth * dpr;
-    el.height = window.innerHeight * dpr;
-    el.style.width = window.innerWidth + 'px';
-    el.style.height = window.innerHeight + 'px';
+    const bottomBar = window.matchMedia('(orientation: portrait)').matches ? 52 : 0;
+    const w = window.innerWidth;
+    const h = window.innerHeight - bottomBar;
+    el.width  = w * dpr;
+    el.height = h * dpr;
+    el.style.width  = w + 'px';
+    el.style.height = h + 'px';
     render();
   }
 
