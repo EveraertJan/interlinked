@@ -729,15 +729,49 @@
 
   let longPressTimer  = null;
   let longPressOrigin = null;  // { x, y } screen coords at touchstart
+  let pinchState      = null;  // { dist, midX, midY } for two-finger pinch
 
   function cancelLongPress() {
     if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
   }
 
+  function pinchDist(touches) {
+    const dx = touches[1].clientX - touches[0].clientX;
+    const dy = touches[1].clientY - touches[0].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
-    if (e.touches.length !== 1) { cancelLongPress(); return; }
 
+    // ── Two fingers → enter pinch mode, cancel any single-touch drag ──
+    if (e.touches.length === 2) {
+      cancelLongPress();
+      // Abort single-touch pan or node drag cleanly
+      if (dragMode === 'pan') {
+        panStart = null; dragMode = null; Canvas.stopDragLoop();
+      } else if (dragMode === 'node' && nodeDragState) {
+        nodeDragState.nodeIds.forEach(id => {
+          const s = nodeDragState.starts.get(id);
+          if (s) State.updateNode(id, s);
+        });
+        nodeDragState = null; dragMode = null; Canvas.stopDragLoop(); Canvas.render();
+      } else if (dragMode === 'connection') {
+        liveCurve = null; highlightMap = null; hoveredPort = null;
+        connDragState = null; dragMode = null; Canvas.stopDragLoop(); Canvas.render();
+      }
+      pinchState = {
+        dist: pinchDist(e.touches),
+        midX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        midY: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+      };
+      return;
+    }
+
+    // More than 2 fingers — ignore
+    if (e.touches.length !== 1) { cancelLongPress(); pinchState = null; return; }
+
+    pinchState = null;
     const touch = e.touches[0];
     cancelLongPress();
 
@@ -777,6 +811,29 @@
 
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
+
+    // ── Two fingers → pinch-to-zoom ──
+    if (e.touches.length === 2 && pinchState) {
+      const newDist = pinchDist(e.touches);
+      const newMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const newMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+      const vp     = State.getViewport();
+      const factor = newDist / pinchState.dist;
+      const newZoom = Math.max(0.2, Math.min(3, vp.zoom * factor));
+      // World point under the previous midpoint stays fixed
+      const wx = (pinchState.midX - vp.x) / vp.zoom;
+      const wy = (pinchState.midY - vp.y) / vp.zoom;
+      State.setViewport({
+        x:    newMidX - wx * newZoom,
+        y:    newMidY - wy * newZoom,
+        zoom: newZoom,
+      });
+
+      pinchState = { dist: newDist, midX: newMidX, midY: newMidY };
+      return;
+    }
+
     if (e.touches.length !== 1) { cancelLongPress(); return; }
     const touch = e.touches[0];
     // Cancel long-press if finger moved more than 10 px
@@ -790,11 +847,17 @@
 
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
+    // Leaving pinch (one finger lifted) — clear pinch state, don't trigger mouse up
+    if (pinchState) {
+      if (e.touches.length < 2) pinchState = null;
+      return;
+    }
     cancelLongPress();
     onMouseUp(mkEvt(e.changedTouches[0]));
   }, { passive: false });
 
   canvas.addEventListener('touchcancel', e => {
+    pinchState = null;
     cancelLongPress();
     if (e.changedTouches[0]) onMouseUp(mkEvt(e.changedTouches[0]));
   }, { passive: false });
