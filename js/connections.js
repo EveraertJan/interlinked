@@ -57,10 +57,14 @@ const Connections = (() => {
     ctx.restore();
   }
 
-  function drawLiveCurve(ctx, fromPort, cursorWorld) {
+  function drawLiveCurve(ctx, fromPort, cursorWorld, backward) {
     const dx = Math.abs(cursorWorld.x - fromPort.x);
-    const cp1 = { x: fromPort.x + dx * 0.5, y: fromPort.y };
-    const cp2 = { x: cursorWorld.x - dx * 0.5, y: cursorWorld.y };
+    const cp1 = backward
+      ? { x: fromPort.x - dx * 0.5,    y: fromPort.y }
+      : { x: fromPort.x + dx * 0.5,    y: fromPort.y };
+    const cp2 = backward
+      ? { x: cursorWorld.x + dx * 0.5, y: cursorWorld.y }
+      : { x: cursorWorld.x - dx * 0.5, y: cursorWorld.y };
 
     ctx.save();
     ctx.setLineDash([6, 4]);

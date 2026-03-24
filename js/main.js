@@ -117,7 +117,7 @@
 
     // Live bezier while dragging a new connection
     if (liveCurve) {
-      Connections.drawLiveCurve(ctx, liveCurve.fromPort, liveCurve.cursorWorld);
+      Connections.drawLiveCurve(ctx, liveCurve.fromPort, liveCurve.cursorWorld, liveCurve.backward);
     }
 
     // Nodes
@@ -192,12 +192,24 @@
       }
     }
 
-    // ── Output port → start connection drag ──
+    // ── Input port → start backward connection drag ──
+    if (hitNode && hitPortSide === 'input') {
+      e.preventDefault();
+      const fromPort = Nodes.getPortPositions(hitNode).input;
+      connDragState  = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'backward' };
+      liveCurve      = { fromPort, cursorWorld: { ...world }, backward: true };
+      highlightMap   = Connections.getHighlightMap(hitNode);
+      dragMode       = 'connection';
+      Canvas.startDragLoop();
+      return;
+    }
+
+    // ── Output port → start forward connection drag ──
     if (hitNode && hitPortSide === 'output') {
       e.preventDefault();
       const fromPort  = Nodes.getPortPositions(hitNode).output;
-      connDragState   = { fromNode: hitNode, fromPort, cursorWorld: { ...world } };
-      liveCurve       = { fromPort, cursorWorld: { ...world } };
+      connDragState   = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'forward' };
+      liveCurve       = { fromPort, cursorWorld: { ...world }, backward: false };
       highlightMap    = Connections.getHighlightMap(hitNode);
       dragMode        = 'connection';
       Canvas.startDragLoop();
@@ -287,14 +299,16 @@
     if (dragMode === 'connection' && connDragState) {
       const world = Canvas.screenToWorld(e.clientX, e.clientY);
       connDragState.cursorWorld = { ...world };
-      liveCurve = { fromPort: connDragState.fromPort, cursorWorld: { ...world } };
+      const bwd = connDragState.direction === 'backward';
+      liveCurve = { fromPort: connDragState.fromPort, cursorWorld: { ...world }, backward: bwd };
 
-      // Highlight input port under cursor
+      // Highlight the target port type: input for forward drag, output for backward drag
       hoveredPort = null;
+      const targetSide = bwd ? 'output' : 'input';
       const nodes = State.getNodes();
       for (let i = nodes.length - 1; i >= 0; i--) {
-        if (Nodes.hitTestPort(nodes[i], world.x, world.y) === 'input') {
-          hoveredPort = { nodeId: nodes[i].id, side: 'input' };
+        if (Nodes.hitTestPort(nodes[i], world.x, world.y) === targetSide) {
+          hoveredPort = { nodeId: nodes[i].id, side: targetSide };
           break;
         }
       }
@@ -342,11 +356,13 @@
       highlightMap = null;
       hoveredPort  = null;
 
-      const world   = connDragState.cursorWorld;
-      const allNodes = State.getNodes();
-      let targetNode = null;
+      const world      = connDragState.cursorWorld;
+      const backward   = connDragState.direction === 'backward';
+      const allNodes   = State.getNodes();
+      const targetSide = backward ? 'output' : 'input';
+      let targetNode   = null;
       for (let i = allNodes.length - 1; i >= 0; i--) {
-        if (Nodes.hitTestPort(allNodes[i], world.x, world.y) === 'input') {
+        if (Nodes.hitTestPort(allNodes[i], world.x, world.y) === targetSide) {
           targetNode = allNodes[i];
           break;
         }
@@ -354,15 +370,19 @@
 
       if (targetNode && Connections.canConnect(connDragState.fromNode, targetNode)) {
         // ── Drop on existing node → create connection ──
+        // Forward: fromNode(output) → target(input)
+        // Backward: target(output) → fromNode(input)
+        const fromN    = backward ? targetNode          : connDragState.fromNode;
+        const toN      = backward ? connDragState.fromNode : targetNode;
         const dup = State.getConnections().find(c =>
-          c.fromNodeId === connDragState.fromNode.id && c.toNodeId === targetNode.id
+          c.fromNodeId === fromN.id && c.toNodeId === toN.id
         );
         if (!dup) {
           State.addConnection({
             id:         crypto.randomUUID(),
-            fromNodeId: connDragState.fromNode.id,
-            toNodeId:   targetNode.id,
-            isLoop:     Connections.isLoop(connDragState.fromNode, targetNode),
+            fromNodeId: fromN.id,
+            toNodeId:   toN.id,
+            isLoop:     Connections.isLoop(fromN, toN),
           });
         }
         connDragState = null;
@@ -380,14 +400,15 @@
         Canvas.stopDragLoop();
         Canvas.render();
 
-        // Pre-select the next tab in the column sequence:
-        //   0 Input Device → 1 Input Effect → 2 Manipulation → 3 Output Effect → 4 Output Device
-        // Column 4 has no successor, so the picker stays on tab 4.
         const srcColIndex = State.getNodes().find(n => n.id === srcId)?.colIndex ?? 0;
-        const nextTab     = Math.min(srcColIndex + 1, 4);
+        // Forward → next tab; backward → previous tab
+        const nextTab = backward
+          ? Math.max(srcColIndex - 1, 0)
+          : Math.min(srcColIndex + 1, 4);
 
-        const srcItem    = items[State.getNodes().find(n => n.id === srcId)?.itemId];
-        const suggested  = new Set([
+        const srcItem   = items[State.getNodes().find(n => n.id === srcId)?.itemId];
+        // Suggested only makes sense going forward (connects_to points downstream)
+        const suggested = backward ? new Set() : new Set([
           ...(srcItem?.connects_to        || []),
           ...(srcItem?.output_connects_to || []),
         ]);
@@ -399,11 +420,15 @@
           State.addNode(newNode);
           const srcNode = State.getNodes().find(n => n.id === srcId);
           if (srcNode) {
+            // Forward: srcNode(output) → newNode(input)
+            // Backward: newNode(output) → srcNode(input)
+            const fromN = backward ? newNode  : srcNode;
+            const toN   = backward ? srcNode  : newNode;
             State.addConnection({
               id:         crypto.randomUUID(),
-              fromNodeId: srcId,
-              toNodeId:   newNode.id,
-              isLoop:     Connections.isLoop(srcNode, newNode),
+              fromNodeId: fromN.id,
+              toNodeId:   toN.id,
+              isLoop:     Connections.isLoop(fromN, toN),
             });
           }
         }, nextTab, suggested);
