@@ -350,6 +350,10 @@
         Canvas.stopDragLoop();
         Canvas.render();
 
+        // Pre-select the next logical column tab (Input Device→Input Effect, etc.)
+        const srcColIndex = State.getNodes().find(n => n.id === srcId)?.colIndex ?? 0;
+        const nextTab = srcColIndex < 4 ? srcColIndex + 1 : srcColIndex;
+
         Picker.open(dropWorld.x, dropWorld.y, screenPos.x, screenPos.y, (itemId, colIndex, wx, wy) => {
           const item = items[itemId];
           if (!item) return;
@@ -364,7 +368,7 @@
               isLoop:     Connections.isLoop(srcNode, newNode),
             });
           }
-        });
+        }, nextTab);
       }
       return;
     }

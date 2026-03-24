@@ -26,9 +26,14 @@ const Picker = (() => {
 
   // ── Open / Close ───────────────────────────────────────────────────────────
 
-  function open(worldX, worldY, screenX, screenY, placeCb) {
+  function open(worldX, worldY, screenX, screenY, placeCb, defaultTab) {
     placeWorld = { x: worldX, y: worldY };
     onPlace    = placeCb;
+
+    // Switch to requested tab before rendering
+    if (defaultTab !== undefined && defaultTab >= 0 && defaultTab <= 4) {
+      activeTab = defaultTab;
+    }
 
     // Position panel — flip if it would overflow viewport
     const PW = 320, PH = 480;
@@ -45,6 +50,7 @@ const Picker = (() => {
 
     searchEl.value = '';
     activeIndex = 0;
+    renderTabs();
     renderList();
     // Focus search on next tick so the dblclick doesn't clear it
     setTimeout(() => searchEl.focus(), 10);

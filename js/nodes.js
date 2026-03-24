@@ -2,8 +2,8 @@
 
 const Nodes = (() => {
   const NODE_WIDTH = 200;
-  const PORT_VISUAL_R = 5;
-  const PORT_HIT_R = 12;
+  const PORT_VISUAL_R = 8;
+  const PORT_HIT_R = 24;
   const COL_BAR = 4;
   const AGENCY_DOT_X = 16; // x center of agency dot relative to node left
   const LABEL_X = 30;      // label start x relative to node left (after bar + dot)
