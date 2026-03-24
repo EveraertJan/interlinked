@@ -141,6 +141,7 @@
   // ── Mouse: main canvas ────────────────────────────────────────────────────
 
   canvas.addEventListener('mousedown',   onMouseDown);
+  canvas.addEventListener('dblclick',    e => openPickerAtPoint(e.clientX, e.clientY));
   canvas.addEventListener('contextmenu', onContextMenu);
   window.addEventListener('mousemove',   onMouseMove);
   window.addEventListener('mouseup',     onMouseUp);
