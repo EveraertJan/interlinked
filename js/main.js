@@ -179,22 +179,15 @@
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
 
-    // Hit-test ports first (topmost node wins)
-    let hitNode = null, hitPortSide = null;
+    // Single hit-test per node using zone (left 25% / middle 50% / right 25%)
+    let hitNode = null, hitZone = null;
     for (let i = nodes.length - 1; i >= 0; i--) {
-      const side = Nodes.hitTestPort(nodes[i], world.x, world.y);
-      if (side) { hitNode = nodes[i]; hitPortSide = side; break; }
+      const zone = Nodes.getNodeZone(nodes[i], world.x, world.y);
+      if (zone) { hitNode = nodes[i]; hitZone = zone; break; }
     }
 
-    // Then hit-test node bodies
-    if (!hitNode) {
-      for (let i = nodes.length - 1; i >= 0; i--) {
-        if (Nodes.hitTestNode(nodes[i], world.x, world.y)) { hitNode = nodes[i]; break; }
-      }
-    }
-
-    // ── Input port → start backward connection drag ──
-    if (hitNode && hitPortSide === 'input') {
+    // ── Left zone → backward connection drag ──
+    if (hitNode && hitZone === 'input') {
       e.preventDefault();
       const fromPort = Nodes.getPortPositions(hitNode).input;
       connDragState  = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'backward' };
@@ -205,8 +198,8 @@
       return;
     }
 
-    // ── Output port → start forward connection drag ──
-    if (hitNode && hitPortSide === 'output') {
+    // ── Right zone → forward connection drag ──
+    if (hitNode && hitZone === 'output') {
       e.preventDefault();
       const fromPort  = Nodes.getPortPositions(hitNode).output;
       connDragState   = { fromNode: hitNode, fromPort, cursorWorld: { ...world }, direction: 'forward' };
@@ -217,7 +210,7 @@
       return;
     }
 
-    // ── Node body → select + start drag ──
+    // ── Middle zone → select + start drag ──
     if (hitNode) {
       e.preventDefault();
       if (!selectedNodeIds.has(hitNode.id)) {
@@ -303,12 +296,13 @@
       const bwd = connDragState.direction === 'backward';
       liveCurve = { fromPort: connDragState.fromPort, cursorWorld: { ...world }, backward: bwd };
 
-      // Highlight the target port type: input for forward drag, output for backward drag
+      // Highlight the target port: any node body hit qualifies; side inferred from drag direction
       hoveredPort = null;
       const targetSide = bwd ? 'output' : 'input';
       const nodes = State.getNodes();
       for (let i = nodes.length - 1; i >= 0; i--) {
-        if (Nodes.hitTestPort(nodes[i], world.x, world.y) === targetSide) {
+        if (nodes[i].id !== connDragState.fromNode.id &&
+            Nodes.hitTestNode(nodes[i], world.x, world.y)) {
           hoveredPort = { nodeId: nodes[i].id, side: targetSide };
           break;
         }
@@ -316,20 +310,23 @@
       return;
     }
 
-    // Hover — port detection for cursor feedback
+    // Hover — zone-based cursor feedback
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
-    let found = null;
+    let foundZone = null, foundNode = null;
     for (let i = nodes.length - 1; i >= 0; i--) {
-      const side = Nodes.hitTestPort(nodes[i], world.x, world.y);
-      if (side) { found = { nodeId: nodes[i].id, side }; break; }
+      const zone = Nodes.getNodeZone(nodes[i], world.x, world.y);
+      if (zone) { foundZone = zone; foundNode = nodes[i]; break; }
     }
-    const prev = hoveredPort;
-    hoveredPort = found;
-    if (JSON.stringify(found) !== JSON.stringify(prev)) {
-      canvas.style.cursor = found ? 'crosshair' : (spaceDown ? 'grab' : 'default');
-      Canvas.render();
-    }
+    const prevPort = hoveredPort;
+    hoveredPort = (foundZone === 'input' || foundZone === 'output')
+      ? { nodeId: foundNode.id, side: foundZone }
+      : null;
+    const nextCursor = foundZone === 'input' || foundZone === 'output'
+      ? 'crosshair'
+      : foundZone === 'body' ? 'grab' : (spaceDown ? 'grab' : 'default');
+    canvas.style.cursor = nextCursor;
+    if (JSON.stringify(hoveredPort) !== JSON.stringify(prevPort)) Canvas.render();
   }
 
   function onMouseUp(e) {
@@ -357,13 +354,13 @@
       highlightMap = null;
       hoveredPort  = null;
 
-      const world      = connDragState.cursorWorld;
-      const backward   = connDragState.direction === 'backward';
-      const allNodes   = State.getNodes();
-      const targetSide = backward ? 'output' : 'input';
-      let targetNode   = null;
+      const world    = connDragState.cursorWorld;
+      const backward = connDragState.direction === 'backward';
+      const allNodes = State.getNodes();
+      let targetNode = null;
       for (let i = allNodes.length - 1; i >= 0; i--) {
-        if (Nodes.hitTestPort(allNodes[i], world.x, world.y) === targetSide) {
+        if (allNodes[i].id !== connDragState.fromNode.id &&
+            Nodes.hitTestNode(allNodes[i], world.x, world.y)) {
           targetNode = allNodes[i];
           break;
         }

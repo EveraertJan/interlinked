@@ -82,6 +82,15 @@ const Nodes = (() => {
            wy >= node.y && wy <= node.y + node.height;
   }
 
+  // Returns 'input' | 'body' | 'output' | null based on horizontal zone within node
+  function getNodeZone(node, wx, wy) {
+    if (!hitTestNode(node, wx, wy)) return null;
+    const relX = wx - node.x;
+    if (relX <= node.width * 0.25) return 'input';
+    if (relX >= node.width * 0.75) return 'output';
+    return 'body';
+  }
+
   function hitTestPort(node, wx, wy) {
     const ports = getPortPositions(node);
     const dx_in = wx - ports.input.x;
@@ -218,6 +227,7 @@ const Nodes = (() => {
     getPortPositions,
     hitTestNode,
     hitTestPort,
+    getNodeZone,
     drawNode,
     drawAll,
     getSenseColor,
