@@ -1,24 +1,15 @@
 // connections.js — bezier curve drawing, connection logic, highlight
 
 const Connections = (() => {
-  // Column adjacency: fromCol → array of valid toCols
-  const VALID_TARGETS = {
-    0: [1],
-    1: [2],
-    2: [2, 3],  // 2→2 is self-loop, 2→3 is forward
-    3: [4],
-    4: [],
-  };
 
+  // Any node can connect to any other node (no column restrictions)
   function canConnect(fromNode, toNode) {
-    if (!fromNode || !toNode) return false;
-    if (fromNode.id === toNode.id) return false;
-    const validCols = VALID_TARGETS[fromNode.colIndex] || [];
-    return validCols.includes(toNode.colIndex);
+    return !!(fromNode && toNode && fromNode.id !== toNode.id);
   }
 
+  // Same-column connections render as dashed arcs
   function isLoop(fromNode, toNode) {
-    return fromNode.colIndex === 2 && toNode.colIndex === 2;
+    return fromNode.colIndex === toNode.colIndex;
   }
 
   function getBezierPoints(fromPort, toPort, loop) {
@@ -121,36 +112,12 @@ const Connections = (() => {
     return false;
   }
 
-  function getHighlightMap(draggingFromNode, items) {
-    // Returns { nodeId: opacity } for all nodes while dragging a connection
+  function getHighlightMap(draggingFromNode) {
+    // Source node stays full opacity; everything else dims slightly to show it's a valid target
     const map = {};
-    const validCols = VALID_TARGETS[draggingFromNode.colIndex] || [];
-    const fromItem = items[draggingFromNode.itemId];
-
-    // Collect preferred target ids
-    const preferred = new Set();
-    if (fromItem) {
-      (fromItem.connects_to || []).forEach(id => preferred.add(id));
-      // For manipulation forward drag, also add output_connects_to
-      if (draggingFromNode.colIndex === 2) {
-        (fromItem.output_connects_to || []).forEach(id => preferred.add(id));
-      }
-    }
-
     State.getNodes().forEach(node => {
-      if (node.id === draggingFromNode.id) {
-        map[node.id] = 1;
-        return;
-      }
-      if (validCols.includes(node.colIndex)) {
-        const targetItem = items[node.itemId];
-        const isPreferred = targetItem && preferred.has(targetItem.id);
-        map[node.id] = isPreferred ? 1.0 : 0.5;
-      } else {
-        map[node.id] = 0.2;
-      }
+      map[node.id] = node.id === draggingFromNode.id ? 1 : 0.65;
     });
-
     return map;
   }
 
@@ -174,7 +141,6 @@ const Connections = (() => {
     hitTestConnection,
     getHighlightMap,
     drawAll,
-    VALID_TARGETS,
   };
 })();
 

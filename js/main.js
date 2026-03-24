@@ -100,15 +100,12 @@
   let highlightMap    = null;   // { nodeId: opacity } while dragging connection
   let hoveredPort     = null;   // { nodeId, side }
   let liveCurve       = null;   // { fromPort, cursorWorld }
-  let selectionRect   = null;   // world-space { x1, y1, x2, y2 }
-
-  let dragMode        = null;   // 'pan' | 'node' | 'connection' | 'select-rect'
+  let dragMode        = null;   // 'pan' | 'node' | 'connection'
   let spaceDown       = false;
 
   let panStart        = null;   // { vpX, vpY, clientX, clientY }
   let nodeDragState   = null;   // { nodeIds, starts, mouseWorld, moved }
   let connDragState   = null;   // { fromNode, fromPort, cursorWorld }
-  let selRectStart    = null;   // { x, y } world
 
   const canvas = Canvas.el;
 
@@ -125,23 +122,6 @@
 
     // Nodes
     Nodes.drawAll(ctx, State.getNodes(), items, [...selectedNodeIds], highlightMap, hoveredPort);
-
-    // Selection rectangle
-    if (selectionRect) {
-      const { x1, y1, x2, y2 } = selectionRect;
-      const rx = Math.min(x1, x2), ry = Math.min(y1, y2);
-      const rw = Math.abs(x2 - x1),  rh = Math.abs(y2 - y1);
-      ctx.save();
-      ctx.strokeStyle = '#4898c0';
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([4, 3]);
-      ctx.globalAlpha = 0.8;
-      ctx.strokeRect(rx, ry, rw, rh);
-      ctx.fillStyle   = 'rgba(72,152,192,0.06)';
-      ctx.globalAlpha = 1;
-      ctx.fillRect(rx, ry, rw, rh);
-      ctx.restore();
-    }
   });
 
   // ── Last-saved label ──────────────────────────────────────────────────────
@@ -205,7 +185,7 @@
       const fromPort  = Nodes.getPortPositions(hitNode).output;
       connDragState   = { fromNode: hitNode, fromPort, cursorWorld: { ...world } };
       liveCurve       = { fromPort, cursorWorld: { ...world } };
-      highlightMap    = Connections.getHighlightMap(hitNode, items);
+      highlightMap    = Connections.getHighlightMap(hitNode);
       dragMode        = 'connection';
       Canvas.startDragLoop();
       return;
@@ -242,12 +222,13 @@
       }
     }
 
-    // ── Empty canvas → selection rect / deselect ──
+    // ── Empty canvas → deselect + pan ──
     selectedNodeIds = new Set();
     selectedConnId  = null;
-    selRectStart    = { ...world };
-    selectionRect   = { x1: world.x, y1: world.y, x2: world.x, y2: world.y };
-    dragMode        = 'select-rect';
+    const vp2 = State.getViewport();
+    panStart = { vpX: vp2.x, vpY: vp2.y, clientX: e.clientX, clientY: e.clientY };
+    dragMode = 'pan';
+    canvas.style.cursor = 'grabbing';
     Canvas.startDragLoop();
   }
 
@@ -288,12 +269,6 @@
           break;
         }
       }
-      return;
-    }
-
-    if (dragMode === 'select-rect' && selRectStart) {
-      const world = Canvas.screenToWorld(e.clientX, e.clientY);
-      selectionRect = { x1: selRectStart.x, y1: selRectStart.y, x2: world.x, y2: world.y };
       return;
     }
 
@@ -348,6 +323,7 @@
       }
 
       if (targetNode && Connections.canConnect(connDragState.fromNode, targetNode)) {
+        // ── Drop on existing node → create connection ──
         const dup = State.getConnections().find(c =>
           c.fromNodeId === connDragState.fromNode.id && c.toNodeId === targetNode.id
         );
@@ -359,32 +335,37 @@
             isLoop:     Connections.isLoop(connDragState.fromNode, targetNode),
           });
         }
-      }
+        connDragState = null;
+        dragMode      = null;
+        Canvas.stopDragLoop();
+        Canvas.render();
+      } else {
+        // ── Drop on empty space → open picker, spawn + auto-connect ──
+        const srcId     = connDragState.fromNode.id;
+        const dropWorld = { ...connDragState.cursorWorld };
+        const screenPos = Canvas.worldToScreen(dropWorld.x, dropWorld.y);
 
-      connDragState = null;
-      dragMode      = null;
-      Canvas.stopDragLoop();
-      Canvas.render();
-      return;
-    }
+        connDragState = null;
+        dragMode      = null;
+        Canvas.stopDragLoop();
+        Canvas.render();
 
-    if (dragMode === 'select-rect') {
-      if (selectionRect) {
-        const r    = selectionRect;
-        const minX = Math.min(r.x1, r.x2), maxX = Math.max(r.x1, r.x2);
-        const minY = Math.min(r.y1, r.y2), maxY = Math.max(r.y1, r.y2);
-        selectedNodeIds = new Set();
-        State.getNodes().forEach(n => {
-          if (n.x < maxX && n.x + n.width > minX && n.y < maxY && n.y + n.height > minY) {
-            selectedNodeIds.add(n.id);
+        Picker.open(dropWorld.x, dropWorld.y, screenPos.x, screenPos.y, (itemId, colIndex, wx, wy) => {
+          const item = items[itemId];
+          if (!item) return;
+          const newNode = Nodes.createNode(itemId, item, colIndex, wx, wy);
+          State.addNode(newNode);
+          const srcNode = State.getNodes().find(n => n.id === srcId);
+          if (srcNode) {
+            State.addConnection({
+              id:         crypto.randomUUID(),
+              fromNodeId: srcId,
+              toNodeId:   newNode.id,
+              isLoop:     Connections.isLoop(srcNode, newNode),
+            });
           }
         });
       }
-      selectionRect = null;
-      selRectStart  = null;
-      dragMode      = null;
-      Canvas.stopDragLoop();
-      Canvas.render();
       return;
     }
 
@@ -679,48 +660,86 @@
   document.getElementById('btn-export-png').addEventListener('click', () => Export.exportPNG(items));
 
   // ── Touch support ─────────────────────────────────────────────────────────
-  // Converts a Touch into a synthetic mouse-event-like object so the existing
-  // mouse handlers can be reused without duplication.
+  // mkEvt converts a Touch into the shape the existing mouse handlers expect.
 
   function mkEvt(touch) {
     return {
-      clientX:    touch.clientX,
-      clientY:    touch.clientY,
-      button:     0,
-      target:     canvas,
-      metaKey:    false,
-      ctrlKey:    false,
-      shiftKey:   false,
+      clientX: touch.clientX, clientY: touch.clientY,
+      button: 0, target: canvas,
+      metaKey: false, ctrlKey: false, shiftKey: false,
       preventDefault() {},
     };
   }
 
-  // Double-tap state for picker
-  let lastTap = { time: 0, x: 0, y: 0 };
+  let lastTap       = { time: 0, x: 0, y: 0 };
+  let longPressTimer  = null;
+  let longPressOrigin = null;  // { x, y } screen coords at touchstart
+
+  function cancelLongPress() {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+  }
 
   canvas.addEventListener('touchstart', e => {
     e.preventDefault();
-    if (e.touches.length !== 1) return;   // ignore multi-touch
-    onMouseDown(mkEvt(e.touches[0]));
+    if (e.touches.length !== 1) { cancelLongPress(); return; }
+
+    const touch = e.touches[0];
+    cancelLongPress();
+
+    // Detect whether the finger is on a node → arm long-press for context menu
+    const world = Canvas.screenToWorld(touch.clientX, touch.clientY);
+    let onNode = false;
+    for (let i = State.getNodes().length - 1; i >= 0; i--) {
+      if (Nodes.hitTestNode(State.getNodes()[i], world.x, world.y)) { onNode = true; break; }
+    }
+
+    if (onNode) {
+      longPressOrigin = { x: touch.clientX, y: touch.clientY };
+      longPressTimer  = setTimeout(() => {
+        longPressTimer = null;
+        // Abort any node drag that started during the press
+        if (dragMode === 'node' && nodeDragState) {
+          nodeDragState.nodeIds.forEach(id => {
+            const s = nodeDragState.starts.get(id);
+            if (s) State.updateNode(id, s);
+          });
+          nodeDragState = null;
+          dragMode      = null;
+          Canvas.stopDragLoop();
+          Canvas.render();
+        }
+        // Show context menu at press location
+        onContextMenu({ preventDefault() {}, clientX: longPressOrigin.x, clientY: longPressOrigin.y });
+      }, 500);
+    }
+
+    onMouseDown(mkEvt(touch));
   }, { passive: false });
 
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
-    if (e.touches.length !== 1) return;
-    onMouseMove(mkEvt(e.touches[0]));
+    if (e.touches.length !== 1) { cancelLongPress(); return; }
+    const touch = e.touches[0];
+    // Cancel long-press if finger moved more than 10 px
+    if (longPressOrigin) {
+      const dx = touch.clientX - longPressOrigin.x;
+      const dy = touch.clientY - longPressOrigin.y;
+      if (dx * dx + dy * dy > 100) cancelLongPress();
+    }
+    onMouseMove(mkEvt(touch));
   }, { passive: false });
 
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
+    cancelLongPress();
     const touch = e.changedTouches[0];
 
-    // Double-tap detection → open picker
+    // Double-tap → open picker (only if not mid-drag)
     const now = Date.now();
     const dx  = touch.clientX - lastTap.x;
     const dy  = touch.clientY - lastTap.y;
     if (now - lastTap.time < 300 && dx * dx + dy * dy < 900) {
       lastTap = { time: 0, x: 0, y: 0 };
-      // Only fire if no drag happened (moved flag not set)
       if (!nodeDragState?.moved && dragMode !== 'pan') {
         onMouseUp(mkEvt(touch));
         onDblClick({ target: canvas, clientX: touch.clientX, clientY: touch.clientY });
@@ -733,6 +752,7 @@
   }, { passive: false });
 
   canvas.addEventListener('touchcancel', e => {
+    cancelLongPress();
     if (e.changedTouches[0]) onMouseUp(mkEvt(e.changedTouches[0]));
   }, { passive: false });
 
