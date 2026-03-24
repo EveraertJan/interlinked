@@ -325,9 +325,9 @@ html, body {
   height: 34px;
 }
 
-/* ── Export bar ── */
-/* Landscape/desktop: sits in the top-right corner, flush with toolbar */
-#export-bar {
+/* ── Bottom bar (Load / Save / SVG / PNG) ── */
+/* Landscape/desktop: flush with the toolbar top-right */
+#bottom-bar {
   position: fixed;
   top: 0;
   right: 0;
@@ -339,16 +339,19 @@ html, body {
   z-index: 100;
 }
 
-/* Portrait (mobile): docked to bottom of screen */
+/* Portrait (mobile): full-width bar docked to bottom */
 @media (orientation: portrait) {
-  #export-bar {
+  #toolbar-new-group,
+  #toolbar-new-sep { display: none; }
+
+  #bottom-bar {
     top: auto;
     bottom: 0;
     left: 0;
     right: 0;
     height: 52px;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     padding: 0 16px;
     background: #ffffff;
     border-top: 1px solid #e4e4e0;

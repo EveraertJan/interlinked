@@ -12,7 +12,7 @@
 
   <!-- Toolbar -->
   <div id="toolbar">
-    <div class="toolbar-group">
+    <div class="toolbar-group" id="toolbar-new-group">
       <button class="tb-btn" id="btn-new" title="New board">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
           <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
@@ -23,25 +23,7 @@
       </button>
     </div>
 
-    <div class="toolbar-sep"></div>
-
-    <div class="toolbar-group">
-      <button class="tb-btn" id="btn-load" title="Load board from JSON">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-          <path d="M2 9.5V11H11V9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M6.5 2V8.5M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Load
-      </button>
-      <button class="tb-btn" id="btn-save" title="Save board as JSON">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-          <path d="M2 3.5V11H11V3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M6.5 2V8.5M4 5l2.5-2.5L9 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Save
-      </button>
-    </div>
-
+    <div class="toolbar-sep" id="toolbar-new-sep"></div>
 
     <div class="toolbar-group">
       <button class="tb-btn" id="btn-layout" title="Auto-layout nodes">
@@ -103,8 +85,23 @@
     </div>
   </div>
 
-  <!-- Export bar (top-right in landscape, bottom in portrait) -->
-  <div id="export-bar">
+  <!-- Bottom bar: file ops top-right in landscape, full-width bottom in portrait -->
+  <div id="bottom-bar">
+    <button class="tb-btn" id="btn-load" title="Load board from JSON">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M2 9.5V11H11V9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M6.5 2V8.5M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Load
+    </button>
+    <button class="tb-btn" id="btn-save" title="Save board as JSON">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M2 3.5V11H11V3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M6.5 2V8.5M4 5l2.5-2.5L9 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Save
+    </button>
+    <div class="toolbar-sep"></div>
     <button class="tb-btn" id="btn-export-svg" title="Export as SVG">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
         <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
