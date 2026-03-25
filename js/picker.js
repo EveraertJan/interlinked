@@ -38,10 +38,10 @@ const Picker = (() => {
     }
 
     // Position panel — flip if it would overflow viewport
-    const PW = 320, PH = 480;
-    let left = screenX;
+    const PW = 740, PH = 520;
+    let left = screenX - Math.round(PW / 2);
     let top  = screenY + 10;
-    if (left + PW > window.innerWidth  - 10) left = screenX - PW;
+    if (left + PW > window.innerWidth  - 10) left = window.innerWidth - PW - 10;
     if (top  + PH > window.innerHeight - 10) top  = screenY - PH - 10;
     left = Math.max(10, left);
     top  = Math.max(54, top);  // stay below toolbar
@@ -112,16 +112,6 @@ const Picker = (() => {
     const rows = []; // { type: 'section'|'divider'|'item', item?, label? }
 
     if (!query) {
-      // Suggested section (wire-drop mode only)
-      if (suggestedIds && suggestedIds.size) {
-        const sugItems = colItems.filter(it => suggestedIds.has(it.id));
-        if (sugItems.length) {
-          rows.push({ type: 'section', label: 'Suggested' });
-          sugItems.forEach(it => rows.push({ type: 'item', item: it, suggested: true }));
-          rows.push({ type: 'divider' });
-        }
-      }
-
       const recentItems = recent
         .map(id => colItems.find(it => it.id === id))
         .filter(Boolean);
@@ -194,15 +184,15 @@ const Picker = (() => {
   }
 
   function makeAgencySVG(agency, color) {
-    const cx = 5, cy = 5, r = 4;
+    const cx = 6, cy = 6, r = 5;
     if (agency === 'active') {
-      return `<svg width="10" height="10"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/></svg>`;
+      return `<svg width="12" height="12"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/></svg>`;
     }
     if (agency === 'passive') {
-      return `<svg width="10" height="10"><circle cx="${cx}" cy="${cy}" r="${r - 0.75}" fill="none" stroke="${color}" stroke-width="1.5"/></svg>`;
+      return `<svg width="12" height="12"><circle cx="${cx}" cy="${cy}" r="${r - 0.75}" fill="none" stroke="${color}" stroke-width="1.5"/></svg>`;
     }
     // semi — right half filled
-    return `<svg width="10" height="10">
+    return `<svg width="12" height="12">
       <path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 1 ${cx} ${cy + r} Z" fill="${color}"/>
       <circle cx="${cx}" cy="${cy}" r="${r - 0.75}" fill="none" stroke="${color}" stroke-width="1.5"/>
     </svg>`;
@@ -239,10 +229,20 @@ const Picker = (() => {
         break;
       case 'ArrowDown':
         e.preventDefault();
-        activeIndex = Math.min(activeIndex + 1, filteredItems.length - 1);
+        activeIndex = Math.min(activeIndex + 6, filteredItems.length - 1);
         updateActiveItem();
         break;
       case 'ArrowUp':
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 6, 0);
+        updateActiveItem();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, filteredItems.length - 1);
+        updateActiveItem();
+        break;
+      case 'ArrowLeft':
         e.preventDefault();
         activeIndex = Math.max(activeIndex - 1, 0);
         updateActiveItem();
