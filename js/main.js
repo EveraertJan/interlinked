@@ -839,7 +839,9 @@
   const projectNameEl = document.getElementById('project-name');
 
   function syncProjectNameEl() {
-    projectNameEl.textContent = State.getProjectName();
+    const name = State.getProjectName();
+    projectNameEl.textContent = name;
+    document.title = name + ' — Interlinked';
   }
 
   projectNameEl.addEventListener('click', () => {
