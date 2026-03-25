@@ -155,24 +155,13 @@ const Nodes = (() => {
     const { x, y, width, height } = node;
     const color = getSenseColor(item.sense);
 
-    // Shadow
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.08)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 2;
-
     // White fill
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(x, y, width, height);
-    ctx.restore();
 
-    // Colour bar
-    //ctx.fillStyle = color;
-    //ctx.fillRect(x, y, COL_BAR, height);
-
-    // Border
-    ctx.strokeStyle = isSelected ? '#1a1a1a' : '#333333';
-    ctx.lineWidth = isSelected ? 2 : 1;
+    // Border — black, thicker when selected
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = isSelected ? 2.5 : 1;
     ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
 
     // Agency dot

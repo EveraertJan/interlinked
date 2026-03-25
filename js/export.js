@@ -372,7 +372,7 @@ const Export = (() => {
       const descIndex  = indexMap.get(node.id) ?? null;
 
       out.push('<g>');
-      out.push(`<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="white" stroke="#e4e4e0" stroke-width="1"/>`);
+      out.push(`<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="white" stroke="#1a1a1a" stroke-width="1"/>`);
       out.push(`<rect x="${x}" y="${y}" width="4" height="${height}" fill="${color}"/>`);
 
       const dotCx = x + 16, dotCy = y + height / 2;
