@@ -406,7 +406,7 @@
     if (dragMode === 'node') {
       if (nodeDragState?.moved) {
         if (snapGrid) {
-          State.getSelected().forEach(id => applySnapToGrid(id));
+          nodeDragState.nodeIds.forEach(id => applySnapToGrid(id));
           Canvas.render();
         }
         State.commitMove();
