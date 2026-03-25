@@ -787,8 +787,8 @@
 
       byCol.forEach((col, ci) => {
         col.sort((a, b) => a.y - b.y);
-        // Centre shorter columns vertically within the component
-        const startRow = Math.floor((maxRows - col.length) / 2);
+        // Snap centre to nearest grid row
+        const startRow = Math.round((maxRows - col.length) / 2);
         col.forEach((n, ri) => {
           targets.set(n.id, {
             x: GRID_X0 + ci * CELL_W,
@@ -800,15 +800,41 @@
       return maxRows;
     }
 
-    if (components.length === 1) {
-      layoutComponent(components[0], 0);
-    } else {
-      let rowOffset = 0;
-      components.forEach(group => {
-        const rows = layoutComponent(group, rowOffset);
-        rowOffset += rows + GAP_ROWS;
+    // Sort largest component first so it anchors the grid
+    const sorted = [...components].sort((a, b) => b.length - a.length);
+
+    // Greedy column-band placement: components whose column ranges don't overlap
+    // share the same row band instead of stacking below each other.
+    const bands = []; // { rowOffset, rowCount, usedCols: Set }
+
+    sorted.forEach(group => {
+      let minCol = 4, maxCol = 0;
+      group.forEach(id => {
+        const n = nodes.find(m => m.id === id);
+        if (n) { minCol = Math.min(minCol, n.colIndex); maxCol = Math.max(maxCol, n.colIndex); }
       });
-    }
+      const groupCols = new Set();
+      for (let c = minCol; c <= maxCol; c++) groupCols.add(c);
+
+      let placed = false;
+      for (const band of bands) {
+        if (![...groupCols].some(c => band.usedCols.has(c))) {
+          const rows = layoutComponent(group, band.rowOffset);
+          band.rowCount = Math.max(band.rowCount, rows);
+          groupCols.forEach(c => band.usedCols.add(c));
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        const offset = bands.length
+          ? Math.max(...bands.map(b => b.rowOffset + b.rowCount)) + GAP_ROWS
+          : 0;
+        const rows = layoutComponent(group, offset);
+        bands.push({ rowOffset: offset, rowCount: rows, usedCols: new Set(groupCols) });
+      }
+    });
 
     // ── Animate to targets ───────────────────────────────────────────────────
     const starts   = new Map();
