@@ -104,6 +104,34 @@ html, body {
 }
 
 
+/* ── Project name ── */
+#project-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: text;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  outline: none;
+  white-space: nowrap;
+  min-width: 60px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+#project-name:hover {
+  border-color: #ccc;
+}
+
+#project-name.editing {
+  border-color: #1a1a1a;
+  user-select: text;
+  cursor: text;
+  overflow: visible;
+}
+
 /* ── Picker Panel ── */
 #picker-panel {
   position: fixed;

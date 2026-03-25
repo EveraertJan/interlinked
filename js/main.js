@@ -834,12 +834,54 @@
     requestAnimationFrame(frame);
   }
 
+  // ── Project name ──────────────────────────────────────────────────────────
+
+  const projectNameEl = document.getElementById('project-name');
+
+  function syncProjectNameEl() {
+    projectNameEl.textContent = State.getProjectName();
+  }
+
+  projectNameEl.addEventListener('click', () => {
+    projectNameEl.contentEditable = 'plaintext-only';
+    projectNameEl.classList.add('editing');
+    // Move cursor to end
+    const range = document.createRange();
+    range.selectNodeContents(projectNameEl);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  });
+
+  function commitProjectName() {
+    const name = projectNameEl.textContent.trim() || 'Untitled';
+    projectNameEl.contentEditable = 'false';
+    projectNameEl.classList.remove('editing');
+    State.setProjectName(name);
+    projectNameEl.textContent = name;
+  }
+
+  projectNameEl.addEventListener('blur', commitProjectName);
+  projectNameEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); projectNameEl.blur(); }
+    if (e.key === 'Escape') {
+      projectNameEl.textContent = State.getProjectName();
+      projectNameEl.contentEditable = 'false';
+      projectNameEl.classList.remove('editing');
+    }
+  });
+
+  State.on('projectName', syncProjectNameEl);
+  syncProjectNameEl();
+
   // ── Toolbar buttons ───────────────────────────────────────────────────────
 
   document.getElementById('btn-new').addEventListener('click', () => {
     if (!State.getNodes().length) return;
     showConfirm('Clear the canvas and start a new board?', () => {
       State.clearAll();
+      State.setProjectName('Untitled');
       selectedNodeIds = new Set();
       selectedConnId  = null;
       Canvas.render();
@@ -862,7 +904,7 @@
     const blob = new Blob([State.serialize()], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement('a'), {
-      href: url, download: `storyboard_${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.json`,
+      href: url, download: `${State.getProjectName().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/g,'') || 'untitled'}_${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.json`,
     });
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 2000);

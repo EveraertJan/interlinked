@@ -8,6 +8,7 @@ const State = (() => {
   let nodes = [];
   let connections = [];
   let viewport = { x: 0, y: 0, zoom: 1 };
+  let projectName = 'Untitled';
   let undoStack = [];
   let redoStack = [];
   let lastSaved = null;
@@ -50,6 +51,12 @@ const State = (() => {
   function getNodes() { return nodes; }
   function getConnections() { return connections; }
   function getViewport() { return viewport; }
+  function getProjectName() { return projectName; }
+  function setProjectName(name) {
+    projectName = name || 'Untitled';
+    emit('projectName', projectName);
+    scheduleSave();
+  }
 
   function setViewport(vp) {
     viewport = vp;
@@ -136,7 +143,7 @@ const State = (() => {
   }
 
   function serialize() {
-    return JSON.stringify({ nodes: deepClone(nodes), connections: deepClone(connections), viewport: deepClone(viewport) });
+    return JSON.stringify({ nodes: deepClone(nodes), connections: deepClone(connections), viewport: deepClone(viewport), projectName });
   }
 
   function deserialize(json) {
@@ -145,7 +152,9 @@ const State = (() => {
     nodes = data.nodes || [];
     connections = data.connections || [];
     if (data.viewport) viewport = data.viewport;
+    projectName = data.projectName || 'Untitled';
     emit('change');
+    emit('projectName', projectName);
     scheduleSave();
   }
 
@@ -167,6 +176,7 @@ const State = (() => {
       nodes = data.nodes || [];
       connections = data.connections || [];
       if (data.viewport) viewport = data.viewport;
+      projectName = data.projectName || 'Untitled';
       return true;
     } catch (e) {
       return false;
@@ -203,7 +213,7 @@ const State = (() => {
 
   return {
     on, emit,
-    getNodes, getConnections, getViewport,
+    getNodes, getConnections, getViewport, getProjectName, setProjectName,
     setViewport,
     addNode, removeNode, removeNodes, updateNode, commitMove,
     addConnection, removeConnection,

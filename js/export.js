@@ -6,6 +6,14 @@ const Export = (() => {
     return new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   }
 
+  function slugify(name) {
+    return (name || 'untitled').toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+  }
+
+  function baseFilename() {
+    return slugify(State.getProjectName()) + '_' + timestamp();
+  }
+
   function triggerDownload(url, filename) {
     const a = document.createElement('a');
     a.href     = url;
@@ -315,7 +323,7 @@ const Export = (() => {
 
     ctx.restore();
 
-    triggerDownload(off.toDataURL('image/png'), 'storyboard_' + timestamp() + '.png');
+    triggerDownload(off.toDataURL('image/png'), baseFilename() + '.png');
   }
 
   // ── SVG export ─────────────────────────────────────────────────────────────
@@ -414,7 +422,7 @@ const Export = (() => {
 
     const blob = new Blob([out.join('\n')], { type: 'image/svg+xml' });
     const url  = URL.createObjectURL(blob);
-    triggerDownload(url, 'storyboard_' + timestamp() + '.svg');
+    triggerDownload(url, baseFilename() + '.svg');
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 
