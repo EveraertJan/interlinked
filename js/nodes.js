@@ -165,7 +165,7 @@ const Nodes = (() => {
 
     // // Border — black, thicker when selected
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = isSelected ? 2.5 : 1;
+    ctx.lineWidth = isSelected ? 1.5 : 1;
     ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
 
     // Agency dot

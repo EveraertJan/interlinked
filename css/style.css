@@ -494,7 +494,7 @@ html, body {
 #confirm-dialog {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -505,12 +505,12 @@ html, body {
 
 .confirm-box {
   background: #fff;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #eeeeee;
   border-radius: 0;
   padding: 24px;
   max-width: 340px;
   width: 90%;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.08);
 }
 
 .confirm-box p {
@@ -528,6 +528,9 @@ html, body {
 
 .confirm-actions .tb-btn {
   height: 34px;
+}
+.confirm-actions .tb-btn:last-child{
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
 }
 
 /* ── Bottom bar (Load / Save / SVG / PNG) ── */

@@ -1349,7 +1349,7 @@
         },
         {
           "id": "oe_environment",
-          "name": "The Environment Responding",
+          "name": "Responsive world",
           "category": "The world around you",
           "connects_to": [
             "od_ambient_light",
