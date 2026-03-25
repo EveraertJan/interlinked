@@ -28,7 +28,8 @@ const Connections = (() => {
     const { cp1, cp2 } = getBezierPoints(fromPort, toPort);
 
     ctx.save();
-    ctx.setLineDash(loop ? [5, 4] : []);
+    // ctx.setLineDash(loop ? [5, 4] : []);
+    ctx.setLineDash(loop ? [2,1] : []);
     ctx.globalAlpha = isSelected ? 1 : 0.4;
 
     ctx.beginPath();
