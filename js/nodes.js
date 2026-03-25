@@ -2,17 +2,17 @@
 
 const Nodes = (() => {
   const NODE_WIDTH = 200;
-  const PORT_VISUAL_R = 6;
+  const PORT_VISUAL_R = 4;
   const PORT_HIT_R = 24;
   const DESC_ICON_R = 7;
   const DESC_ICON_HIT_R = 12;
   const COL_BAR = 4;
-  const AGENCY_DOT_X = 16; // x center of agency dot relative to node left
+  const AGENCY_DOT_X = 18; // x center of agency dot relative to node left
   const LABEL_X = 30;      // label start x relative to node left (after bar + dot)
-  const PADDING_TOP = 10;
-  const PADDING_BOT = 10;
-  const LINE_H = 18;
-  const MIN_HEIGHT = 44;
+  const PADDING_TOP = 6;
+  const PADDING_BOT = 6;
+  const LINE_H = 8;
+  const MIN_HEIGHT = 36;
 
   const SENSES = {
     sight:          '#c8a828',
@@ -34,7 +34,7 @@ const Nodes = (() => {
   }
 
   function measureLabel(label, maxWidth) {
-    measureCtx.font = '13px Inter, sans-serif';
+    measureCtx.font = '12px Inter, sans-serif';
     const words = label.split(' ');
     const lines = [];
     let current = '';
@@ -155,12 +155,16 @@ const Nodes = (() => {
     const { x, y, width, height } = node;
     const color = getSenseColor(item.sense);
 
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    const shadowOffset = 6;
+    ctx.fillRect(x+shadowOffset, y+shadowOffset, width, height);
+
     // White fill
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(x, y, width, height);
 
-    // Border — black, thicker when selected
-    ctx.strokeStyle = '#1a1a1a';
+    // // Border — black, thicker when selected
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = isSelected ? 2.5 : 1;
     ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
 
@@ -170,7 +174,7 @@ const Nodes = (() => {
     drawAgencyDot(ctx, dotX, dotY, item.agency, color);
 
     // Label
-    ctx.font = '13px Inter, sans-serif';
+    ctx.font = '12px Inter, sans-serif';
     ctx.fillStyle = '#1a1a1a';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
