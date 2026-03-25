@@ -404,7 +404,13 @@
     }
 
     if (dragMode === 'node') {
-      if (nodeDragState?.moved) State.commitMove();
+      if (nodeDragState?.moved) {
+        if (snapGrid) {
+          State.getSelected().forEach(id => applySnapToGrid(id));
+          Canvas.render();
+        }
+        State.commitMove();
+      }
       nodeDragState = null;
       canvas.style.cursor = 'default';
       Canvas.stopDragLoop();
@@ -933,6 +939,28 @@
   });
 
   document.getElementById('btn-layout').addEventListener('click', autoLayout);
+
+  // ── Snap to grid ──────────────────────────────────────────────────────────
+  const SNAP_SIZE = 40;
+  let snapGrid = localStorage.getItem('snapGrid') === 'true';
+
+  const btnSnap = document.getElementById('btn-snap');
+  function updateSnapBtn() { btnSnap.classList.toggle('active', snapGrid); }
+  updateSnapBtn();
+
+  btnSnap.addEventListener('click', () => {
+    snapGrid = !snapGrid;
+    localStorage.setItem('snapGrid', snapGrid);
+    updateSnapBtn();
+  });
+
+  function applySnapToGrid(nodeId) {
+    const n = State.getNodes().find(m => m.id === nodeId);
+    if (!n) return;
+    const sx = Math.round(n.x / SNAP_SIZE) * SNAP_SIZE;
+    const sy = Math.round(n.y / SNAP_SIZE) * SNAP_SIZE;
+    if (sx !== n.x || sy !== n.y) State.updateNode(nodeId, { x: sx, y: sy });
+  }
 
   document.getElementById('btn-save').addEventListener('click', () => {
     const blob = new Blob([State.serialize()], { type: 'application/json' });

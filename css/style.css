@@ -88,6 +88,12 @@ html, body {
   background: #d8d8d8;
 }
 
+.tb-btn.active {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
 .tb-btn.primary {
   background: #1a1a1a;
   color: #fff;
