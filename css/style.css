@@ -127,7 +127,8 @@ html, body {
 
 #project-name.editing {
   border-color: #1a1a1a;
-  user-select: text;
+  user-select: text !important;
+  -webkit-user-select: text !important;
   cursor: text;
   overflow: visible;
 }

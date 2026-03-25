@@ -843,8 +843,10 @@
   }
 
   projectNameEl.addEventListener('click', () => {
-    projectNameEl.contentEditable = 'plaintext-only';
+    if (projectNameEl.classList.contains('editing')) return;
+    projectNameEl.contentEditable = 'true';
     projectNameEl.classList.add('editing');
+    projectNameEl.focus();
     // Move cursor to end
     const range = document.createRange();
     range.selectNodeContents(projectNameEl);
@@ -855,6 +857,7 @@
   });
 
   function commitProjectName() {
+    if (!projectNameEl.classList.contains('editing')) return;
     const name = projectNameEl.textContent.trim() || 'Untitled';
     projectNameEl.contentEditable = 'false';
     projectNameEl.classList.remove('editing');
