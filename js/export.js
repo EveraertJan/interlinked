@@ -289,8 +289,7 @@ const Export = (() => {
     off.height    = canvasH * DPR;
     const ctx     = off.getContext('2d');
 
-    ctx.fillStyle = '#f5f4f0';
-    ctx.fillRect(0, 0, off.width, off.height);
+    // transparent background — no fillRect
 
     ctx.save();
     ctx.scale(DPR, DPR);
@@ -337,7 +336,7 @@ const Export = (() => {
     const out = [];
     out.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${bb.w}" height="${totalH}" viewBox="${bb.x} ${bb.y} ${bb.w} ${totalH}">`);
     out.push(`<style>text { font-family: Inter, sans-serif; }</style>`);
-    out.push(`<rect x="${bb.x}" y="${bb.y}" width="${bb.w}" height="${totalH}" fill="#f5f4f0"/>`);
+    // transparent background;
 
     // ── Connections ──
     out.push('<g id="connections">');
