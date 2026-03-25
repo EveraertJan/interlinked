@@ -171,6 +171,18 @@
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
 
+    // ⓘ icon click → show/hide description tooltip
+    for (const n of nodes) {
+      if (Nodes.hitTestDescIcon(n, world.x, world.y)) {
+        if (descTooltip.hasAttribute('hidden')) {
+          showDescTooltip(n, e.clientX, e.clientY);
+        } else {
+          hideDescTooltip();
+        }
+        return;
+      }
+    }
+
     // Hit detection: zones (touch) vs port circles (mouse)
     let hitNode = null, hitSide = null;
     if (e._fromTouch) {
@@ -319,6 +331,25 @@
     // Hover — port-dot hit for cursor feedback (mouse only; touch has no hover)
     const world = Canvas.screenToWorld(e.clientX, e.clientY);
     const nodes = State.getNodes();
+
+    // ⓘ icon hover → show tooltip
+    let overIcon = false;
+    for (const n of nodes) {
+      if (Nodes.hitTestDescIcon(n, world.x, world.y)) {
+        overIcon = true;
+        showDescTooltip(n, e.clientX, e.clientY);
+        canvas.style.cursor = 'pointer';
+        break;
+      }
+    }
+    if (!overIcon) hideDescTooltip();
+    if (overIcon) {
+      const prevPort = hoveredPort;
+      hoveredPort = null;
+      if (JSON.stringify(hoveredPort) !== JSON.stringify(prevPort)) Canvas.render();
+      return;
+    }
+
     let found = null;
     for (let i = nodes.length - 1; i >= 0; i--) {
       const side = Nodes.hitTestPort(nodes[i], world.x, world.y);
@@ -581,42 +612,76 @@
 
   document.addEventListener('mousedown', e => {
     if (!ctxMenu.hasAttribute('hidden') && !ctxMenu.contains(e.target)) hideContextMenu();
+    if (!descTooltip.hasAttribute('hidden') && e.target !== canvas) hideDescTooltip();
   });
 
-  // ── Comment editor ────────────────────────────────────────────────────────
+  // ── Comment popup ─────────────────────────────────────────────────────────
 
-  const commentEditor = document.getElementById('comment-editor');
-  let commentNodeId   = null;
+  const commentPopup  = document.getElementById('comment-popup');
+  const cpopLabel     = document.getElementById('cpop-label');
+  const cpopDesc      = document.getElementById('cpop-desc');
+  const cpopSave      = document.getElementById('cpop-save');
+  const cpopCancel    = document.getElementById('cpop-cancel');
+  let   commentNodeId = null;
 
   function openCommentEditor(nodeId) {
     const node = State.getNodes().find(n => n.id === nodeId);
     if (!node) return;
     commentNodeId = nodeId;
-    // Position below node center in screen coords
     const bottomWorld = { x: node.x + node.width / 2, y: node.y + node.height };
-    const screen = Canvas.worldToScreen(bottomWorld.x, bottomWorld.y);
-    commentEditor.style.left = screen.x + 'px';
-    commentEditor.style.top  = (screen.y + 10) + 'px';
-    commentEditor.value = node.comment || '';
-    commentEditor.removeAttribute('hidden');
-    commentEditor.focus();
-    commentEditor.select();
+    const sc = Canvas.worldToScreen(bottomWorld.x, bottomWorld.y);
+    commentPopup.style.left = sc.x + 'px';
+    commentPopup.style.top  = (sc.y + 12) + 'px';
+    cpopLabel.value = node.comment     || '';
+    cpopDesc.value  = node.description || '';
+    commentPopup.removeAttribute('hidden');
+    cpopLabel.focus();
   }
 
   function closeCommentEditor(save) {
     if (save && commentNodeId) {
-      State.updateNode(commentNodeId, { comment: commentEditor.value.trim() });
+      State.updateNode(commentNodeId, {
+        comment:     cpopLabel.value.trim(),
+        description: cpopDesc.value.trim(),
+      });
       Canvas.render();
     }
-    commentEditor.setAttribute('hidden', '');
+    commentPopup.setAttribute('hidden', '');
     commentNodeId = null;
   }
 
-  commentEditor.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); closeCommentEditor(true); }
-    if (e.key === 'Escape') { closeCommentEditor(false); }
+  cpopSave.addEventListener('click',   () => closeCommentEditor(true));
+  cpopCancel.addEventListener('click', () => closeCommentEditor(false));
+
+  commentPopup.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeCommentEditor(false);
+    if (e.key === 'Enter' && e.target === cpopLabel && !e.shiftKey) {
+      e.preventDefault(); closeCommentEditor(true);
+    }
   });
-  commentEditor.addEventListener('blur', () => closeCommentEditor(true));
+
+  // Close popup when clicking outside
+  document.addEventListener('mousedown', e => {
+    if (!commentPopup.hasAttribute('hidden') && !commentPopup.contains(e.target)) {
+      closeCommentEditor(true);
+    }
+  });
+
+  // ── Description tooltip ───────────────────────────────────────────────────
+
+  const descTooltip = document.getElementById('desc-tooltip');
+
+  function showDescTooltip(node, screenX, screenY) {
+    descTooltip.textContent = node.description;
+    descTooltip.style.left = (screenX + 12) + 'px';
+    descTooltip.style.top  = (screenY - 8)  + 'px';
+    descTooltip.removeAttribute('hidden');
+  }
+
+  function hideDescTooltip() {
+    descTooltip.setAttribute('hidden', '');
+  }
+
 
   // ── Confirm dialog ────────────────────────────────────────────────────────
 

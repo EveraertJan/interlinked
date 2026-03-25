@@ -4,6 +4,8 @@ const Nodes = (() => {
   const NODE_WIDTH = 200;
   const PORT_VISUAL_R = 6;
   const PORT_HIT_R = 24;
+  const DESC_ICON_R = 7;
+  const DESC_ICON_HIT_R = 12;
   const COL_BAR = 4;
   const AGENCY_DOT_X = 16; // x center of agency dot relative to node left
   const LABEL_X = 30;      // label start x relative to node left (after bar + dot)
@@ -89,6 +91,19 @@ const Nodes = (() => {
     if (relX <= node.width * 0.25) return node.colIndex === 0 ? 'body' : 'input';
     if (relX >= node.width * 0.75) return node.colIndex === 4 ? 'body' : 'output';
     return 'body';
+  }
+
+  // Returns {x, y} of the ⓘ badge, or null if node has no description
+  function getDescIconPos(node) {
+    if (!node.description) return null;
+    return { x: node.x + node.width - DESC_ICON_R - 4, y: node.y + DESC_ICON_R + 4 };
+  }
+
+  function hitTestDescIcon(node, wx, wy) {
+    const pos = getDescIconPos(node);
+    if (!pos) return false;
+    const dx = wx - pos.x, dy = wy - pos.y;
+    return dx * dx + dy * dy <= DESC_ICON_HIT_R * DESC_ICON_HIT_R;
   }
 
   function hitTestPort(node, wx, wy) {
@@ -204,13 +219,27 @@ const Nodes = (() => {
       ctx.stroke();
     }
 
-    // Comment below node
+    // Short label below node
     if (node.comment) {
       ctx.font = 'italic 11px Inter, sans-serif';
       ctx.fillStyle = '#888888';
       ctx.textBaseline = 'top';
       ctx.textAlign = 'center';
       ctx.fillText(node.comment, x + width / 2, y + height + 6);
+    }
+
+    // ⓘ badge (top-right corner) when description exists
+    if (node.description) {
+      const ic = getDescIconPos(node);
+      ctx.beginPath();
+      ctx.arc(ic.x, ic.y, DESC_ICON_R, 0, Math.PI * 2);
+      ctx.fillStyle = '#e8e8e4';
+      ctx.fill();
+      ctx.font = 'bold 9px Inter, sans-serif';
+      ctx.fillStyle = '#888';
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.fillText('i', ic.x, ic.y + 0.5);
     }
 
     ctx.globalAlpha = 1;
@@ -233,6 +262,8 @@ const Nodes = (() => {
     hitTestNode,
     hitTestPort,
     getNodeZone,
+    getDescIconPos,
+    hitTestDescIcon,
     drawNode,
     drawAll,
     getSenseColor,

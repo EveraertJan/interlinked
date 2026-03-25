@@ -72,8 +72,24 @@
     <button class="ctx-item danger" id="ctx-delete">Delete node</button>
   </div>
 
-  <!-- Comment editor overlay -->
-  <input id="comment-editor" type="text" placeholder="Add a comment…" hidden>
+  <!-- Comment popup -->
+  <div id="comment-popup" hidden>
+    <div class="cpop-row">
+      <label for="cpop-label">Label</label>
+      <input id="cpop-label" type="text" placeholder="Short label below node…" maxlength="60">
+    </div>
+    <div class="cpop-row">
+      <label for="cpop-desc">Description</label>
+      <textarea id="cpop-desc" placeholder="Longer explanation (shown on hover)…" rows="3"></textarea>
+    </div>
+    <div class="cpop-actions">
+      <button id="cpop-cancel">Cancel</button>
+      <button id="cpop-save">Save</button>
+    </div>
+  </div>
+
+  <!-- Description tooltip -->
+  <div id="desc-tooltip" hidden></div>
 
   <!-- Confirm Dialog -->
   <div id="confirm-dialog" hidden>
