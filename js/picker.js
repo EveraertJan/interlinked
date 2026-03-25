@@ -38,7 +38,7 @@ const Picker = (() => {
     }
 
     // Position panel — flip if it would overflow viewport
-    const PW = 740, PH = 520;
+    const PW = 800, PH = 520;
     let left = screenX - Math.round(PW / 2);
     let top  = screenY + 10;
     if (left + PW > window.innerWidth  - 10) left = window.innerWidth - PW - 10;

@@ -741,21 +741,74 @@
 
     State.pushSnapshot();
 
-    const COL_X   = [80, 360, 640, 920, 1200];
-    const byCol   = [[], [], [], [], []];
-    nodes.forEach(n => (byCol[n.colIndex] || []).push(n));
+    const connections = State.getConnections();
 
-    const targets = new Map();
-    byCol.forEach((col, ci) => {
-      col.sort((a, b) => a.y - b.y);
-      let y = 80;
-      col.forEach(n => {
-        targets.set(n.id, { x: COL_X[ci], y });
-        y += n.height + 24;
-      });
+    // ── Find connected components (undirected BFS) ──────────────────────────
+    const adj = new Map(nodes.map(n => [n.id, new Set()]));
+    connections.forEach(c => {
+      if (adj.has(c.fromNodeId)) adj.get(c.fromNodeId).add(c.toNodeId);
+      if (adj.has(c.toNodeId))   adj.get(c.toNodeId).add(c.fromNodeId);
     });
 
-    const starts = new Map();
+    const visited    = new Set();
+    const components = [];
+    nodes.forEach(n => {
+      if (visited.has(n.id)) return;
+      const group = [];
+      const queue = [n.id];
+      visited.add(n.id);
+      while (queue.length) {
+        const id = queue.shift();
+        group.push(id);
+        for (const nb of (adj.get(id) || [])) {
+          if (!visited.has(nb)) { visited.add(nb); queue.push(nb); }
+        }
+      }
+      components.push(group);
+    });
+
+    // ── Assign target positions ──────────────────────────────────────────────
+    const COL_X     = [80, 360, 640, 920, 1200];
+    const NODE_GAP  = 24;  // vertical gap between nodes in the same column
+    const GROUP_GAP = 80;  // vertical gap between separate graphs
+    const targets   = new Map();
+
+    // Layout one component, starting at offsetY; returns the height used.
+    function layoutComponent(nodeIds, offsetY) {
+      const byCol = [[], [], [], [], []];
+      nodeIds.forEach(id => {
+        const n = nodes.find(m => m.id === id);
+        if (n) (byCol[n.colIndex] || []).push(n);
+      });
+
+      let groupH = 0;
+      byCol.forEach((col, ci) => {
+        col.sort((a, b) => a.y - b.y);
+        let y = offsetY;
+        col.forEach(n => {
+          targets.set(n.id, { x: COL_X[ci], y });
+          y += n.height + NODE_GAP;
+        });
+        const colH = col.reduce((s, n) => s + n.height + NODE_GAP, 0);
+        if (colH > groupH) groupH = colH;
+      });
+      return groupH;
+    }
+
+    if (components.length === 1) {
+      // Single connected graph — squash into columns from y=80
+      layoutComponent(components[0], 80);
+    } else {
+      // Multiple graphs — layout each independently, stacked vertically
+      let offsetY = 80;
+      components.forEach(group => {
+        const h = layoutComponent(group, offsetY);
+        offsetY += h + GROUP_GAP;
+      });
+    }
+
+    // ── Animate to targets ───────────────────────────────────────────────────
+    const starts   = new Map();
     nodes.forEach(n => starts.set(n.id, { x: n.x, y: n.y }));
 
     const DURATION = 300;
