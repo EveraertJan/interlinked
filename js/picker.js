@@ -112,17 +112,7 @@ const Picker = (() => {
     const rows = []; // { type: 'section'|'divider'|'item', item?, label? }
 
     if (!query) {
-      const recentItems = recent
-        .map(id => colItems.find(it => it.id === id))
-        .filter(Boolean);
-      const otherItems = colItems.filter(it => !recent.includes(it.id));
-
-      if (recentItems.length) {
-        rows.push({ type: 'section', label: 'Recent' });
-        recentItems.forEach(it => rows.push({ type: 'item', item: it }));
-        if (otherItems.length) rows.push({ type: 'divider' });
-      }
-      otherItems.forEach(it => rows.push({ type: 'item', item: it }));
+      colItems.forEach(it => rows.push({ type: 'item', item: it }));
     } else {
       colItems
         .filter(it => it.name.toLowerCase().includes(query))
@@ -229,12 +219,12 @@ const Picker = (() => {
         break;
       case 'ArrowDown':
         e.preventDefault();
-        activeIndex = Math.min(activeIndex + 6, filteredItems.length - 1);
+        activeIndex = Math.min(activeIndex + 4, filteredItems.length - 1);
         updateActiveItem();
         break;
       case 'ArrowUp':
         e.preventDefault();
-        activeIndex = Math.max(activeIndex - 6, 0);
+        activeIndex = Math.max(activeIndex - 4, 0);
         updateActiveItem();
         break;
       case 'ArrowRight':
