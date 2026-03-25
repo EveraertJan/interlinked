@@ -150,7 +150,7 @@ const Nodes = (() => {
     }
   }
 
-  function drawNode(ctx, node, item, isSelected, opacity, hoveredPort) {
+  function drawNode(ctx, node, item, isSelected, opacity, hoveredPort, descIndex = null) {
     if (opacity !== undefined && opacity !== null) ctx.globalAlpha = opacity;
     const { x, y, width, height } = node;
     const color = getSenseColor(item.sense);
@@ -228,31 +228,41 @@ const Nodes = (() => {
       ctx.fillText(node.comment, x + width / 2, y + height + 6);
     }
 
-    // ⓘ badge (top-right corner) when description exists
+    // Index badge (top-right corner) when description exists
     if (node.description) {
       const ic = getDescIconPos(node);
       ctx.beginPath();
       ctx.arc(ic.x, ic.y, DESC_ICON_R, 0, Math.PI * 2);
-      ctx.fillStyle = '#e8e8e4';
+      ctx.fillStyle = '#e0e0da';
       ctx.fill();
       ctx.font = 'bold 9px Inter, sans-serif';
-      ctx.fillStyle = '#888';
+      ctx.fillStyle = '#666';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
-      ctx.fillText('i', ic.x, ic.y + 0.5);
+      ctx.fillText(descIndex != null ? String(descIndex) : 'i', ic.x, ic.y + 0.5);
     }
 
     ctx.globalAlpha = 1;
   }
 
+  // Returns a Map<nodeId, 1-based-index> for nodes that have descriptions,
+  // sorted left-to-right then top-to-bottom.
+  function buildDescIndexMap(nodes) {
+    const annotated = [...nodes]
+      .filter(n => n.description)
+      .sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+    return new Map(annotated.map((n, i) => [n.id, i + 1]));
+  }
+
   function drawAll(ctx, nodes, items, selectedIds, highlightMap, hoveredPort) {
-    const selSet = new Set(selectedIds || []);
+    const selSet   = new Set(selectedIds || []);
+    const idxMap   = buildDescIndexMap(nodes);
     nodes.forEach(node => {
       const item = items[node.itemId];
       if (!item) return;
       const isSelected = selSet.has(node.id);
-      const opacity = highlightMap ? (highlightMap[node.id] !== undefined ? highlightMap[node.id] : 1) : 1;
-      drawNode(ctx, node, item, isSelected, opacity, hoveredPort);
+      const opacity    = highlightMap ? (highlightMap[node.id] !== undefined ? highlightMap[node.id] : 1) : 1;
+      drawNode(ctx, node, item, isSelected, opacity, hoveredPort, idxMap.get(node.id) ?? null);
     });
   }
 
@@ -264,6 +274,7 @@ const Nodes = (() => {
     getNodeZone,
     getDescIconPos,
     hitTestDescIcon,
+    buildDescIndexMap,
     drawNode,
     drawAll,
     getSenseColor,
