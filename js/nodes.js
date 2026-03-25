@@ -231,10 +231,10 @@ const Nodes = (() => {
     // Index badge (top-right corner) when description exists
     if (node.description) {
       const ic = getDescIconPos(node);
-      ctx.beginPath();
-      ctx.arc(ic.x, ic.y, DESC_ICON_R, 0, Math.PI * 2);
-      ctx.fillStyle = '#e0e0da';
-      ctx.fill();
+      // ctx.beginPath();
+      // ctx.arc(ic.x, ic.y, DESC_ICON_R, 0, Math.PI * 2);
+      // ctx.fillStyle = '#e0e0da';
+      // ctx.fill();
       ctx.font = 'bold 9px Inter, sans-serif';
       ctx.fillStyle = '#666';
       ctx.textBaseline = 'middle';
