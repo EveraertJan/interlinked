@@ -13,9 +13,11 @@ const Connections = (() => {
   }
 
   function getBezierPoints(fromPort, toPort) {
-    // Use a minimum pull so same-column (loop) connections still curve naturally
-    const dx   = Math.abs(toPort.x - fromPort.x);
-    const pull = Math.max(dx * 0.5, 80);
+    const adx  = Math.abs(toPort.x - fromPort.x);
+    const ady  = Math.abs(toPort.y - fromPort.y);
+    // Pull scales with horizontal distance so the curve never folds back on itself.
+    // A small fraction of vertical distance adds curvature for same-column links.
+    const pull = Math.min(adx * 0.4 + ady * 0.1, 160);
     return {
       cp1: { x: fromPort.x + pull, y: fromPort.y },
       cp2: { x: toPort.x  - pull,  y: toPort.y  },
@@ -50,13 +52,15 @@ const Connections = (() => {
   }
 
   function drawLiveCurve(ctx, fromPort, cursorWorld, backward) {
-    const dx = Math.abs(cursorWorld.x - fromPort.x);
+    const adx  = Math.abs(cursorWorld.x - fromPort.x);
+    const ady  = Math.abs(cursorWorld.y - fromPort.y);
+    const pull = Math.min(adx * 0.4 + ady * 0.1, 160);
     const cp1 = backward
-      ? { x: fromPort.x - dx * 0.5,    y: fromPort.y }
-      : { x: fromPort.x + dx * 0.5,    y: fromPort.y };
+      ? { x: fromPort.x   - pull, y: fromPort.y }
+      : { x: fromPort.x   + pull, y: fromPort.y };
     const cp2 = backward
-      ? { x: cursorWorld.x + dx * 0.5, y: cursorWorld.y }
-      : { x: cursorWorld.x - dx * 0.5, y: cursorWorld.y };
+      ? { x: cursorWorld.x + pull, y: cursorWorld.y }
+      : { x: cursorWorld.x - pull, y: cursorWorld.y };
 
     ctx.save();
     ctx.setLineDash([6, 4]);
