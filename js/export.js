@@ -65,7 +65,7 @@ const Export = (() => {
   //
   // Layout constants (world / SVG units — PNG scales by DPR separately)
 
-  const NUM_COLS   = 4;
+  const NUM_COLS   = 5;
   const FOOT_GAP   = 80;   // below lowest node
   const SIDE_PAD   = 40;   // left/right inset from bb.x
   const COL_GAP    = 32;   // between columns
