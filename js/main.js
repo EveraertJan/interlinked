@@ -504,7 +504,7 @@
   // ── Keyboard ──────────────────────────────────────────────────────────────
 
   window.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
 
     const cmd = e.metaKey || e.ctrlKey;
 
