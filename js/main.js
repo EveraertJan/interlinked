@@ -767,43 +767,46 @@
       components.push(group);
     });
 
-    // ── Assign target positions ──────────────────────────────────────────────
-    const COL_X     = [80, 360, 640, 920, 1200];
-    const NODE_GAP  = 24;  // vertical gap between nodes in the same column
-    const GROUP_GAP = 80;  // vertical gap between separate graphs
+    // ── Assign target positions (grid layout) ───────────────────────────────
+    const GRID_X0   = 80;
+    const CELL_W    = 280;   // horizontal step between columns
+    const CELL_H    = 80;    // vertical grid unit (row height)
+    const GAP_ROWS  = 2;     // empty rows between disconnected components
     const targets   = new Map();
 
-    // Layout one component, starting at offsetY; returns the height used.
-    function layoutComponent(nodeIds, offsetY) {
+    // Layout one component; rowOffset is the starting grid row.
+    // Returns the number of grid rows consumed.
+    function layoutComponent(nodeIds, rowOffset) {
       const byCol = [[], [], [], [], []];
       nodeIds.forEach(id => {
         const n = nodes.find(m => m.id === id);
-        if (n) (byCol[n.colIndex] || []).push(n);
+        if (n) byCol[n.colIndex].push(n);
       });
 
-      let groupH = 0;
+      const maxRows = Math.max(...byCol.map(c => c.length), 1);
+
       byCol.forEach((col, ci) => {
         col.sort((a, b) => a.y - b.y);
-        let y = offsetY;
-        col.forEach(n => {
-          targets.set(n.id, { x: COL_X[ci], y });
-          y += n.height + NODE_GAP;
+        // Centre shorter columns vertically within the component
+        const startRow = Math.floor((maxRows - col.length) / 2);
+        col.forEach((n, ri) => {
+          targets.set(n.id, {
+            x: GRID_X0 + ci * CELL_W,
+            y: 80 + (rowOffset + startRow + ri) * CELL_H,
+          });
         });
-        const colH = col.reduce((s, n) => s + n.height + NODE_GAP, 0);
-        if (colH > groupH) groupH = colH;
       });
-      return groupH;
+
+      return maxRows;
     }
 
     if (components.length === 1) {
-      // Single connected graph — squash into columns from y=80
-      layoutComponent(components[0], 80);
+      layoutComponent(components[0], 0);
     } else {
-      // Multiple graphs — layout each independently, stacked vertically
-      let offsetY = 80;
+      let rowOffset = 0;
       components.forEach(group => {
-        const h = layoutComponent(group, offsetY);
-        offsetY += h + GROUP_GAP;
+        const rows = layoutComponent(group, rowOffset);
+        rowOffset += rows + GAP_ROWS;
       });
     }
 
