@@ -34,19 +34,12 @@ const Export = (() => {
 
   // ── Bezier helpers ──────────────────────────────────────────────────────────
 
-  function bezierControlPoints(fromPort, toPort, loop) {
-    const dx = Math.abs(toPort.x - fromPort.x);
-    const dy = toPort.y - fromPort.y;
-    if (loop) {
-      const loopH = 55 + Math.abs(dy) * 0.25;
-      return {
-        cp1: { x: fromPort.x + 40,      y: fromPort.y - loopH },
-        cp2: { x: toPort.x  - 40,       y: toPort.y   - loopH },
-      };
-    }
+  function bezierControlPoints(fromPort, toPort) {
+    const dx   = Math.abs(toPort.x - fromPort.x);
+    const pull = Math.max(dx * 0.5, 80);
     return {
-      cp1: { x: fromPort.x + dx * 0.5, y: fromPort.y },
-      cp2: { x: toPort.x  - dx * 0.5,  y: toPort.y  },
+      cp1: { x: fromPort.x + pull, y: fromPort.y },
+      cp2: { x: toPort.x  - pull,  y: toPort.y  },
     };
   }
 
@@ -354,7 +347,7 @@ const Export = (() => {
       if (!fromNode || !toNode) return;
       const fromPort     = Nodes.getPortPositions(fromNode).output;
       const toPort       = Nodes.getPortPositions(toNode).input;
-      const { cp1, cp2 } = bezierControlPoints(fromPort, toPort, conn.isLoop);
+      const { cp1, cp2 } = bezierControlPoints(fromPort, toPort);
       const d    = `M ${fromPort.x} ${fromPort.y} C ${cp1.x} ${cp1.y} ${cp2.x} ${cp2.y} ${toPort.x} ${toPort.y}`;
       const dash = conn.isLoop ? ' stroke-dasharray="5,4"' : '';
       out.push(`<path d="${d}" stroke="#a0aab8" stroke-width="1.5" fill="none" opacity="0.6"${dash}/>`);

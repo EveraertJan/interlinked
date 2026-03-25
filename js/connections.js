@@ -12,26 +12,18 @@ const Connections = (() => {
     return fromNode.colIndex === toNode.colIndex;
   }
 
-  function getBezierPoints(fromPort, toPort, loop) {
-    const dx = Math.abs(toPort.x - fromPort.x);
-    const dy = toPort.y - fromPort.y;
-
-    if (loop) {
-      const loopH = 55 + Math.abs(dy) * 0.25;
-      return {
-        cp1: { x: fromPort.x + 40, y: fromPort.y - loopH },
-        cp2: { x: toPort.x - 40,   y: toPort.y - loopH },
-      };
-    }
-
+  function getBezierPoints(fromPort, toPort) {
+    // Use a minimum pull so same-column (loop) connections still curve naturally
+    const dx   = Math.abs(toPort.x - fromPort.x);
+    const pull = Math.max(dx * 0.5, 80);
     return {
-      cp1: { x: fromPort.x + dx * 0.5, y: fromPort.y },
-      cp2: { x: toPort.x  - dx * 0.5, y: toPort.y  },
+      cp1: { x: fromPort.x + pull, y: fromPort.y },
+      cp2: { x: toPort.x  - pull,  y: toPort.y  },
     };
   }
 
   function drawConnection(ctx, fromPort, toPort, isSelected, loop) {
-    const { cp1, cp2 } = getBezierPoints(fromPort, toPort, loop);
+    const { cp1, cp2 } = getBezierPoints(fromPort, toPort);
 
     ctx.save();
     ctx.setLineDash(loop ? [5, 4] : []);
@@ -96,8 +88,7 @@ const Connections = (() => {
 
     const fromPort = Nodes.getPortPositions(fromNode).output;
     const toPort   = Nodes.getPortPositions(toNode).input;
-    const loop = conn.isLoop;
-    const { cp1, cp2 } = getBezierPoints(fromPort, toPort, loop);
+    const { cp1, cp2 } = getBezierPoints(fromPort, toPort);
 
     const SAMPLES = 24;
     const THRESHOLD = 8;
