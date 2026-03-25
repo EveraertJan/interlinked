@@ -2,7 +2,7 @@
 
 const Nodes = (() => {
   const NODE_WIDTH = 200;
-  const PORT_VISUAL_R = 8;
+  const PORT_VISUAL_R = 6;
   const PORT_HIT_R = 24;
   const COL_BAR = 4;
   const AGENCY_DOT_X = 16; // x center of agency dot relative to node left
@@ -86,19 +86,23 @@ const Nodes = (() => {
   function getNodeZone(node, wx, wy) {
     if (!hitTestNode(node, wx, wy)) return null;
     const relX = wx - node.x;
-    if (relX <= node.width * 0.25) return 'input';
-    if (relX >= node.width * 0.75) return 'output';
+    if (relX <= node.width * 0.25) return node.colIndex === 0 ? 'body' : 'input';
+    if (relX >= node.width * 0.75) return node.colIndex === 4 ? 'body' : 'output';
     return 'body';
   }
 
   function hitTestPort(node, wx, wy) {
     const ports = getPortPositions(node);
-    const dx_in = wx - ports.input.x;
-    const dy_in = wy - ports.input.y;
-    if (dx_in * dx_in + dy_in * dy_in <= PORT_HIT_R * PORT_HIT_R) return 'input';
-    const dx_out = wx - ports.output.x;
-    const dy_out = wy - ports.output.y;
-    if (dx_out * dx_out + dy_out * dy_out <= PORT_HIT_R * PORT_HIT_R) return 'output';
+    if (node.colIndex !== 0) {
+      const dx_in = wx - ports.input.x;
+      const dy_in = wy - ports.input.y;
+      if (dx_in * dx_in + dy_in * dy_in <= PORT_HIT_R * PORT_HIT_R) return 'input';
+    }
+    if (node.colIndex !== 4) {
+      const dx_out = wx - ports.output.x;
+      const dy_out = wy - ports.output.y;
+      if (dx_out * dx_out + dy_out * dy_out <= PORT_HIT_R * PORT_HIT_R) return 'output';
+    }
     return null;
   }
 
@@ -148,8 +152,8 @@ const Nodes = (() => {
     ctx.restore();
 
     // Colour bar
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, COL_BAR, height);
+    //ctx.fillStyle = color;
+    //ctx.fillRect(x, y, COL_BAR, height);
 
     // Border
     ctx.strokeStyle = isSelected ? '#1a1a1a' : '#333333';
@@ -174,39 +178,40 @@ const Nodes = (() => {
       ctx.fillText(line, x + LABEL_X, textStartY + i * LINE_H);
     });
 
-    // Column name (small caps, rotated along the colour bar)
-    ctx.save();
-    ctx.font = '500 8px Inter, sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
-    ctx.translate(x + COL_BAR / 2, y + height / 2);
-    ctx.rotate(-Math.PI / 2);
-    const colName = (item.colName || '').toUpperCase();
-    ctx.fillText(colName, 0, 0);
-    ctx.restore();
-
-    // Input port
     const ports = getPortPositions(node);
     const isHoverIn = hoveredPort && hoveredPort.nodeId === node.id && hoveredPort.side === 'input';
     const isHoverOut = hoveredPort && hoveredPort.nodeId === node.id && hoveredPort.side === 'output';
 
-    ctx.beginPath();
-    ctx.arc(ports.input.x, ports.input.y, PORT_VISUAL_R, 0, Math.PI * 2);
-    ctx.fillStyle = isHoverIn ? color : '#ffffff';
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.fill();
-    ctx.stroke();
+    // Input port (not on Input Device, col 0)
+    if (node.colIndex !== 0) {
+      ctx.beginPath();
+      ctx.arc(ports.input.x, ports.input.y, PORT_VISUAL_R, 0, Math.PI * 2);
+      ctx.fillStyle = isHoverIn ? color : '#ffffff';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.fill();
+      ctx.stroke();
+    }
 
-    // Output port
-    ctx.beginPath();
-    ctx.arc(ports.output.x, ports.output.y, PORT_VISUAL_R, 0, Math.PI * 2);
-    ctx.fillStyle = isHoverOut ? color : '#ffffff';
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.fill();
-    ctx.stroke();
+    // Output port (not on Output Device, col 4)
+    if (node.colIndex !== 4) {
+      ctx.beginPath();
+      ctx.arc(ports.output.x, ports.output.y, PORT_VISUAL_R, 0, Math.PI * 2);
+      ctx.fillStyle = isHoverOut ? color : '#ffffff';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Comment below node
+    if (node.comment) {
+      ctx.font = 'italic 11px Inter, sans-serif';
+      ctx.fillStyle = '#888888';
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'center';
+      ctx.fillText(node.comment, x + width / 2, y + height + 6);
+    }
 
     ctx.globalAlpha = 1;
   }

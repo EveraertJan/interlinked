@@ -281,6 +281,22 @@ html, body {
 .ctx-item.danger { color: #c0392b; }
 .ctx-item.danger:hover { background: #fdf0ee; }
 
+#comment-editor {
+  position: fixed;
+  z-index: 400;
+  font: italic 12px 'Inter', sans-serif;
+  color: #444;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 3px 7px;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  min-width: 140px;
+  transform: translateX(-50%);
+}
+#comment-editor[hidden] { display: none; }
+
 /* ── Delete Confirmation Dialog ── */
 #confirm-dialog {
   position: fixed;
@@ -320,7 +336,8 @@ html, body {
   height: 34px;
 }
 
-/* ── Bottom bar (Load / Save / SVG / PNG) — always at bottom ── */
+/* ── Bottom bar (Load / Save / SVG / PNG) ── */
+/* Narrow screens: full-width bar at the bottom */
 #bottom-bar {
   position: fixed;
   bottom: 0;
@@ -335,4 +352,20 @@ html, body {
   background: #ffffff;
   border-top: 1px solid #e4e4e0;
   z-index: 100;
+}
+
+/* Wide screens (≥600px): file buttons sit in the top-right, flush with toolbar */
+@media (min-width: 600px) {
+  #bottom-bar {
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: 0;
+    height: 44px;
+    background: transparent;
+    border-top: none;
+    justify-content: flex-end;
+    padding: 0 12px;
+    gap: 4px;
+  }
 }

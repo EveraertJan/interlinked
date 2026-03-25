@@ -127,7 +127,13 @@
   // ── Mouse: main canvas ────────────────────────────────────────────────────
 
   canvas.addEventListener('mousedown',   onMouseDown);
-  canvas.addEventListener('dblclick',    e => openPickerAtPoint(e.clientX, e.clientY));
+  canvas.addEventListener('dblclick',    e => {
+    const world = Canvas.screenToWorld(e.clientX, e.clientY);
+    for (const n of State.getNodes()) {
+      if (Nodes.hitTestNode(n, world.x, world.y)) { openCommentEditor(n.id); return; }
+    }
+    openPickerAtPoint(e.clientX, e.clientY);
+  });
   canvas.addEventListener('contextmenu', onContextMenu);
   window.addEventListener('mousemove',   onMouseMove);
   window.addEventListener('mouseup',     onMouseUp);
@@ -524,9 +530,10 @@
 
   // ── Context menu ──────────────────────────────────────────────────────────
 
-  const ctxMenu   = document.getElementById('context-menu');
-  const ctxDelete = document.getElementById('ctx-delete');
-  let ctxNodeId   = null;
+  const ctxMenu    = document.getElementById('context-menu');
+  const ctxDelete  = document.getElementById('ctx-delete');
+  const ctxComment = document.getElementById('ctx-comment');
+  let ctxNodeId    = null;
 
   function onContextMenu(e) {
     e.preventDefault();
@@ -566,9 +573,50 @@
     }
   });
 
+  ctxComment.addEventListener('click', () => {
+    const id = ctxNodeId;
+    hideContextMenu();
+    openCommentEditor(id);
+  });
+
   document.addEventListener('mousedown', e => {
     if (!ctxMenu.hasAttribute('hidden') && !ctxMenu.contains(e.target)) hideContextMenu();
   });
+
+  // ── Comment editor ────────────────────────────────────────────────────────
+
+  const commentEditor = document.getElementById('comment-editor');
+  let commentNodeId   = null;
+
+  function openCommentEditor(nodeId) {
+    const node = State.getNodes().find(n => n.id === nodeId);
+    if (!node) return;
+    commentNodeId = nodeId;
+    // Position below node center in screen coords
+    const bottomWorld = { x: node.x + node.width / 2, y: node.y + node.height };
+    const screen = Canvas.worldToScreen(bottomWorld.x, bottomWorld.y);
+    commentEditor.style.left = screen.x + 'px';
+    commentEditor.style.top  = (screen.y + 10) + 'px';
+    commentEditor.value = node.comment || '';
+    commentEditor.removeAttribute('hidden');
+    commentEditor.focus();
+    commentEditor.select();
+  }
+
+  function closeCommentEditor(save) {
+    if (save && commentNodeId) {
+      State.updateNode(commentNodeId, { comment: commentEditor.value.trim() });
+      Canvas.render();
+    }
+    commentEditor.setAttribute('hidden', '');
+    commentNodeId = null;
+  }
+
+  commentEditor.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); closeCommentEditor(true); }
+    if (e.key === 'Escape') { closeCommentEditor(false); }
+  });
+  commentEditor.addEventListener('blur', () => closeCommentEditor(true));
 
   // ── Confirm dialog ────────────────────────────────────────────────────────
 

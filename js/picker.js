@@ -177,7 +177,7 @@ const Picker = (() => {
       labelEl.className   = 'picker-item-label';
       labelEl.textContent = it.name;
 
-      rowEl.appendChild(senseDot);
+      // rowEl.appendChild(senseDot);
       rowEl.appendChild(agencyEl);
       rowEl.appendChild(labelEl);
       rowEl.addEventListener('click', () => placeItem(it));
