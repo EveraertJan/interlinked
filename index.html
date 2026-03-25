@@ -136,6 +136,51 @@
     </button>
   </div>
 
+  <!-- Welcome modal -->
+  <div id="welcome-overlay" hidden>
+    <div id="welcome-modal">
+      <h2>Interaction Storyboard</h2>
+      <p class="welcome-sub">A tool for mapping interactive experiences — from sensor to sensation.</p>
+
+      <div class="welcome-cols">
+        <div class="welcome-section">
+          <h3>Where to start</h3>
+          <ol class="welcome-steps">
+            <li><strong>Target a feeling.</strong> What emotion should the interaction evoke? Start there, not with the technology.</li>
+            <li><strong>Pick an Output Effect.</strong> What sensory output fits that feeling? Dim, warm light and a slow soundtrack for something somber — bright strobes for energy.</li>
+            <li><strong>Add Output Technology.</strong> The physical devices that produce that effect: a PAR fixture, a speaker, a fog machine.</li>
+            <li><strong>Define an Input Effect.</strong> What triggers it? Presence in the room, a gesture, a sound level, proximity?</li>
+            <li><strong>Add a Manipulation node.</strong> How does raw input become a trigger — a threshold, a curve, a mapping?</li>
+            <li><strong>Add Input Technology.</strong> The sensors or devices that capture the input.</li>
+            <li><strong>Annotate your nodes.</strong> A short label like "PAR can" or a note explaining a design decision keeps the graph readable when sharing.</li>
+          </ol>
+        </div>
+
+        <div class="welcome-section welcome-controls">
+          <h3>Controls</h3>
+          <dl class="welcome-dl">
+            <dt>Add a node</dt>
+            <dd>Double-click or long-press on the canvas</dd>
+            <dt>Connect nodes</dt>
+            <dd>Drag from the left or right edge of a node</dd>
+            <dt>Move a node</dt>
+            <dd>Drag from its centre</dd>
+            <dt>Pan</dt>
+            <dd>Drag on empty canvas, or hold Space + drag</dd>
+            <dt>Zoom</dt>
+            <dd>Scroll wheel or pinch</dd>
+            <dt>Node options</dt>
+            <dd>Long-press (or right-click) a node</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="welcome-footer">
+        <button id="welcome-dismiss">Get started</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Hidden file input for load -->
   <input type="file" id="file-input" accept=".json" style="display:none">
 

@@ -93,6 +93,28 @@
 
   Picker.init(graphData.columns, items);
 
+  // ── Welcome modal (first visit) ───────────────────────────────────────────
+
+  const welcomeOverlay = document.getElementById('welcome-overlay');
+  const welcomeDismiss = document.getElementById('welcome-dismiss');
+
+  if (!localStorage.getItem('interlinked_welcomed')) {
+    welcomeOverlay.removeAttribute('hidden');
+  }
+
+  function dismissWelcome() {
+    welcomeOverlay.setAttribute('hidden', '');
+    localStorage.setItem('interlinked_welcomed', '1');
+  }
+
+  welcomeDismiss.addEventListener('click', dismissWelcome);
+  welcomeOverlay.addEventListener('click', e => {
+    if (e.target === welcomeOverlay) dismissWelcome();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !welcomeOverlay.hasAttribute('hidden')) dismissWelcome();
+  });
+
   // ── Interaction state ─────────────────────────────────────────────────────
 
   let selectedNodeIds = new Set();
