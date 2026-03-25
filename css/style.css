@@ -301,8 +301,8 @@ html, body {
 
 .welcome-cols {
   display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 32px;
+  grid-template-columns: 1fr 340px;
+  gap: 36px;
   align-items: start;
 }
 
@@ -356,6 +356,15 @@ html, body {
 .welcome-dl dd {
   color: #666;
   margin: 0;
+}
+
+.welcome-dl code {
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  font-size: 11px;
+  background: #f0efeb;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #444;
 }
 
 .welcome-footer {
