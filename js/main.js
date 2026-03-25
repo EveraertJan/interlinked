@@ -95,16 +95,19 @@
 
   // ── Welcome modal (first visit) ───────────────────────────────────────────
 
-  const welcomeOverlay = document.getElementById('welcome-overlay');
-  const welcomeDismiss = document.getElementById('welcome-dismiss');
+  const welcomeOverlay  = document.getElementById('welcome-overlay');
+  const welcomeDismiss  = document.getElementById('welcome-dismiss');
+  const welcomeDsaCheck = document.getElementById('welcome-dsa-check');
 
-  if (!localStorage.getItem('interlinked_welcomed')) {
+  if (!localStorage.getItem('interlinked_skip_welcome')) {
     welcomeOverlay.removeAttribute('hidden');
   }
 
   function dismissWelcome() {
     welcomeOverlay.setAttribute('hidden', '');
-    localStorage.setItem('interlinked_welcomed', '1');
+    if (welcomeDsaCheck.checked) {
+      localStorage.setItem('interlinked_skip_welcome', '1');
+    }
   }
 
   welcomeDismiss.addEventListener('click', dismissWelcome);

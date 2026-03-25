@@ -370,7 +370,26 @@ html, body {
 .welcome-footer {
   margin-top: 28px;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 16px;
+}
+
+.welcome-dsa {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  user-select: none;
+}
+
+.welcome-dsa input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #1a1a1a;
 }
 
 #welcome-dismiss {
