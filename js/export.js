@@ -65,7 +65,7 @@ const Export = (() => {
   //
   // Layout constants (world / SVG units — PNG scales by DPR separately)
 
-  const NUM_COLS   = 3;
+  const NUM_COLS   = 4;
   const FOOT_GAP   = 80;   // below lowest node
   const SIDE_PAD   = 40;   // left/right inset from bb.x
   const COL_GAP    = 32;   // between columns
@@ -118,19 +118,21 @@ const Export = (() => {
   // ── PNG footnotes (canvas 2D) ────────────────────────────────────────────────
 
   function wrapCanvas(ctx, text, maxWidth) {
-    const words = text.split(' ');
     const lines = [];
-    let cur = '';
-    for (const w of words) {
-      const candidate = cur ? cur + ' ' + w : w;
-      if (ctx.measureText(candidate).width > maxWidth && cur) {
-        lines.push(cur);
-        cur = w;
-      } else {
-        cur = candidate;
+    for (const para of text.split('\n')) {
+      const words = para.split(' ');
+      let cur = '';
+      for (const w of words) {
+        const candidate = cur ? cur + ' ' + w : w;
+        if (ctx.measureText(candidate).width > maxWidth && cur) {
+          lines.push(cur);
+          cur = w;
+        } else {
+          cur = candidate;
+        }
       }
+      lines.push(cur); // always push, even if empty (preserves blank lines)
     }
-    if (cur) lines.push(cur);
     return lines.length ? lines : [''];
   }
 
@@ -198,15 +200,17 @@ const Export = (() => {
   function wrapSVG(text, colW) {
     // Approximate: Inter 12px ≈ 6.4px per char
     const maxChars = Math.floor(colW / 6.4);
-    const words = text.split(' ');
     const lines = [];
-    let cur = '';
-    for (const w of words) {
-      const candidate = cur ? cur + ' ' + w : w;
-      if (candidate.length > maxChars && cur) { lines.push(cur); cur = w; }
-      else cur = candidate;
+    for (const para of text.split('\n')) {
+      const words = para.split(' ');
+      let cur = '';
+      for (const w of words) {
+        const candidate = cur ? cur + ' ' + w : w;
+        if (candidate.length > maxChars && cur) { lines.push(cur); cur = w; }
+        else cur = candidate;
+      }
+      lines.push(cur); // preserves blank lines from \n
     }
-    if (cur) lines.push(cur);
     return lines.length ? lines : [''];
   }
 
