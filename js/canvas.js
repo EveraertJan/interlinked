@@ -1,5 +1,7 @@
 // canvas.js — render loop, pan/zoom, coordinate transforms
 
+const VERSION = 'v56';
+
 const Canvas = (() => {
   const el = document.getElementById('graph-canvas');
   const ctx = el.getContext('2d');
@@ -66,13 +68,16 @@ const Canvas = (() => {
 
   function drawZoomIndicator() {
     const vp = State.getViewport();
-    const text = Math.round(vp.zoom * 100) + '%';
+    const x = el.width / dpr - 12;
+    const y = el.height / dpr - 12;
     ctx.save();
     ctx.font = '11px Inter, sans-serif';
     ctx.fillStyle = '#aaa';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(text, el.width / dpr - 12, el.height / dpr - 12);
+    ctx.fillText(Math.round(vp.zoom * 100) + '%', x, y);
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillText(VERSION, x, y - 14);
     ctx.restore();
   }
 
