@@ -965,10 +965,14 @@
   document.getElementById('btn-save').addEventListener('click', () => {
     const blob = new Blob([State.serialize()], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement('a'), {
-      href: url, download: `${State.getProjectName().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/g,'') || 'untitled'}_${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.json`,
-    });
+    const name = `${State.getProjectName().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/g,'') || 'untitled'}_${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.json`;
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = name;
+    a.style.display = 'none';
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   });
 
