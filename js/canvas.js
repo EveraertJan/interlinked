@@ -15,7 +15,8 @@ const Canvas = (() => {
   function resize() {
     dpr = window.devicePixelRatio || 1;
     const w = window.innerWidth;
-    const h = window.innerHeight - 52; // always leave room for bottom bar
+    const bottomBarH = w < 600 ? 52 : 0;
+    const h = window.innerHeight - bottomBarH;
     el.width  = w * dpr;
     el.height = h * dpr;
     el.style.width  = w + 'px';

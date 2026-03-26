@@ -89,9 +89,9 @@ html, body {
 }
 
 .tb-btn.active {
-  background: #1a1a1a;
-  color: #fff;
-  border-color: #1a1a1a;
+  background: #efefef;
+  color: #000;
+  border-color: #efefef;
 }
 
 .tb-btn.primary {
@@ -566,6 +566,59 @@ html, body {
 }
 .confirm-actions .tb-btn:last-child{
   box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+}
+
+/* ── Toolbar rows ── */
+.tb-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Mobile (< 600px) ── */
+@media (max-width: 599px) {
+  /* Toolbar: two stacked rows */
+  #toolbar {
+    flex-direction: column;
+    height: auto;
+    padding: 0;
+    align-items: stretch;
+    gap: 0;
+  }
+  .tb-row {
+    height: 44px;
+    padding: 0 12px;
+    gap: 4px;
+  }
+  .tb-row-1 {
+    box-shadow: 0 1px 0 rgba(0,0,0,0.07);
+  }
+
+  /* Picker: single column */
+  #picker-panel {
+    width: calc(100vw - 16px);
+    left: 8px !important;
+    right: 8px;
+    max-height: 70vh;
+  }
+  .picker-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* Welcome modal: single column */
+  .welcome-cols {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .welcome-controls {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 24px;
+  }
+  #welcome-modal {
+    padding: 24px 20px 20px;
+  }
 }
 
 /* ── Bottom bar (Load / Save / SVG / PNG) ── */
